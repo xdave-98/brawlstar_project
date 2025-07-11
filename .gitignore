@@ -1,0 +1,22 @@
+# Data and API responses
+/data/*
+
+# Virtual environment
+.venv/*
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/
+
+# Environment variables (API keys)
+.env
+.env.local
+
+# MacOS & Linux metadata
+.DS_Store
+Thumbs.db

@@ -8,5 +8,7 @@ dependencies = [
     "polars>=1.31.0",
     "pre-commit>=4.2.0",
     "pyiceberg>=0.9.1",
+    "python-dotenv>=1.1.1",
+    "requests>=2.32.4",
     "ruff>=0.12.3",
 ]
