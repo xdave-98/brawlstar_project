@@ -128,7 +128,8 @@ class TestBattleDetails:
         assert battle.type == "soloRanked"
         assert battle.result == "defeat"
         assert battle.duration == 115
-        assert battle.starPlayer.tag == "#2PJRY0U8V"
+        assert battle.starPlayer is not None
+        assert getattr(battle.starPlayer, "tag", None) == "#2PJRY0U8V"
         assert len(battle.teams) == 1
         assert len(battle.teams[0]) == 1
 
