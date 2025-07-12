@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from brawlstar_project.entities.player.player import Player
+from brawlstar_project.entities.player import Player
 from brawlstar_project.processing.processed.analysis import (
     BattlelogAnalysis,
 )
