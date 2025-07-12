@@ -4,7 +4,7 @@ Tests for Pydantic models in Brawl Stars data processing.
 
 import pytest
 from datetime import datetime
-from brawlstar_project.player.models import (
+from brawlstar_project.player.player_models import (
     Club,
     Brawler,
     PlayerData,

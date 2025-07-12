@@ -30,25 +30,21 @@ class Player:
     def formatted_tag(self) -> str:
         return self.tag.replace("#", "%23")
 
-    def load_player_data(
-        self, base_dir: Path, days: Optional[int] = 1
-    ) -> Optional[pl.DataFrame]:
+    def _load_data(self, base_dir: Path, filename: str, days: int) -> Optional[pl.DataFrame]:
         dfs = []
         today = datetime.today()
-
-        if days is None or not isinstance(days, int) or days < 1:
-            raise ValueError("Parameter 'days' must be a positive integer.")
-
         for i in range(days):
             day = today - timedelta(days=i)
             date_str = day.strftime("%Y-%m-%d")
-            parquet_path = base_dir / self.tag / date_str / "player.parquet"
+            parquet_path = base_dir / self.tag / date_str / filename
             if parquet_path.exists():
                 df = pl.read_parquet(parquet_path)
                 df = df.with_columns(pl.lit(date_str).alias("date"))
                 dfs.append(df)
+        return pl.concat(dfs) if dfs else None
 
-        if dfs:
-            return pl.concat(dfs)
-        else:
-            return None
+    def load_player_data(self, base_dir: Path, days: int = 1) -> Optional[pl.DataFrame]:
+        return self._load_data(base_dir, "player.parquet", days)
+
+    def load_battlelog_data(self, base_dir: Path, days: int = 1) -> Optional[pl.DataFrame]:
+        return self._load_data(base_dir, "battlelog.parquet", days)

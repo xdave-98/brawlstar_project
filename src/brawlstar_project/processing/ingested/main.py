@@ -2,8 +2,8 @@ import argparse
 
 from brawlstar_project.processing.ingested.config import ConfigLoader
 from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
-from brawlstar_project.processing.player import Player
-from brawlstar_project.processing.utils import save_player_data
+from brawlstar_project.player.player import Player
+from brawlstar_project.processing.utils import save_player_data, save_battlelog_data
 
 
 def main():
@@ -21,11 +21,16 @@ def main():
     config = ConfigLoader.from_env()
     client = BrawlStarsClient(api_key=config.api_key, base_url=config.base_url)
 
-    # Get player data
+    # Instanciate Player
     player = Player(args.player_tag)
-    data = client.get_player(player.formatted_tag)
 
-    save_player_data(data, player.tag)
+    # Get player and player battlelog data
+    player_data = client.get_player(player.formatted_tag)
+    player_battlelog = client.get_battlelog(player.formatted_tag)
+
+    # Save both player and battlelog data
+    save_player_data(player_data, player.tag)
+    save_battlelog_data(player_battlelog, player.tag)
 
 
 if __name__ == "__main__":
