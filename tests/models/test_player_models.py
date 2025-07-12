@@ -107,7 +107,8 @@ class TestPlayerData:
         assert player.tag == "#PLAYER123"
         assert player.name == "TestPlayer"
         assert player.trophies == 1000
-        assert player.club.name == "Test Club"
+        assert player.club is not None
+        assert getattr(player.club, "name", None) == "Test Club"
         assert len(player.brawlers) == 1
         assert player.brawlers[0].name == "Shelly"
 
