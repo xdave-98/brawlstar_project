@@ -4,37 +4,37 @@ Tests for Pydantic models in Brawl Stars data processing.
 
 import pytest
 from datetime import datetime
-from brawlstar_project.processing.models import (
-    Club, 
-    Brawler, 
-    PlayerData, 
-    FlattenedPlayerData, 
-    create_flattened_player_data
+from brawlstar_project.player.models import (
+    Club,
+    Brawler,
+    PlayerData,
+    FlattenedPlayerData,
+    create_flattened_player_data,
 )
 
 
 class TestClub:
     """Test Club model."""
-    
+
     def test_valid_club(self):
         """Test valid club data."""
         club_data = {"name": "Test Club", "tag": "#CLUB123"}
         club = Club.model_validate(club_data)
-        
+
         assert club.name == "Test Club"
         assert club.tag == "#CLUB123"
-    
+
     def test_invalid_club_missing_fields(self):
         """Test invalid club data with missing fields."""
         club_data = {"name": "Test Club"}  # Missing tag
-        
+
         with pytest.raises(ValueError):
             Club.model_validate(club_data)
 
 
 class TestBrawler:
     """Test Brawler model."""
-    
+
     def test_valid_brawler(self):
         """Test valid brawler data."""
         brawler_data = {
@@ -43,17 +43,17 @@ class TestBrawler:
             "power": 11,
             "rank": 25,
             "trophies": 500,
-            "highestTrophies": 600
+            "highestTrophies": 600,
         }
         brawler = Brawler.model_validate(brawler_data)
-        
+
         assert brawler.id == 1
         assert brawler.name == "Shelly"
         assert brawler.power == 11
         assert brawler.rank == 25
         assert brawler.trophies == 500
         assert brawler.highestTrophies == 600
-    
+
     def test_invalid_brawler_power(self):
         """Test invalid brawler power level."""
         brawler_data = {
@@ -62,16 +62,16 @@ class TestBrawler:
             "power": 12,  # Invalid power level
             "rank": 25,
             "trophies": 500,
-            "highestTrophies": 600
+            "highestTrophies": 600,
         }
-        
+
         with pytest.raises(ValueError):
             Brawler.model_validate(brawler_data)
 
 
 class TestPlayerData:
     """Test PlayerData model."""
-    
+
     def test_valid_player_data(self):
         """Test valid player data."""
         player_data = {
@@ -87,10 +87,7 @@ class TestPlayerData:
             "duoVictories": 25,
             "bestRoboRumbleTime": 300,
             "bestTimeAsBigBrawler": 600,
-            "club": {
-                "name": "Test Club",
-                "tag": "#CLUB123"
-            },
+            "club": {"name": "Test Club", "tag": "#CLUB123"},
             "brawlers": [
                 {
                     "id": 1,
@@ -98,20 +95,20 @@ class TestPlayerData:
                     "power": 11,
                     "rank": 25,
                     "trophies": 500,
-                    "highestTrophies": 600
+                    "highestTrophies": 600,
                 }
-            ]
+            ],
         }
-        
+
         player = PlayerData.model_validate(player_data)
-        
+
         assert player.tag == "#PLAYER123"
         assert player.name == "TestPlayer"
         assert player.trophies == 1000
         assert player.club.name == "Test Club"
         assert len(player.brawlers) == 1
         assert player.brawlers[0].name == "Shelly"
-    
+
     def test_player_data_without_club(self):
         """Test player data without club information."""
         player_data = {
@@ -121,11 +118,11 @@ class TestPlayerData:
             "highestTrophies": 1200,
             "expLevel": 50,
             "expPoints": 50000,
-            "brawlers": []
+            "brawlers": [],
         }
-        
+
         player = PlayerData.model_validate(player_data)
-        
+
         assert player.tag == "#PLAYER123"
         assert player.club is None
         assert len(player.brawlers) == 0
@@ -133,7 +130,7 @@ class TestPlayerData:
 
 class TestFlattenedPlayerData:
     """Test FlattenedPlayerData model."""
-    
+
     def test_valid_flattened_data(self):
         """Test valid flattened player data."""
         flattened_data = {
@@ -154,11 +151,11 @@ class TestFlattenedPlayerData:
             "total_brawlers": 5,
             "maxed_brawlers": 2,
             "total_brawler_trophies": 2500,
-            "extracted_at": datetime.now()
+            "extracted_at": datetime.now(),
         }
-        
+
         flattened = FlattenedPlayerData.model_validate(flattened_data)
-        
+
         assert flattened.tag == "#PLAYER123"
         assert flattened.name == "TestPlayer"
         assert flattened.total_brawlers == 5
@@ -168,7 +165,7 @@ class TestFlattenedPlayerData:
 
 class TestCreateFlattenedPlayerData:
     """Test create_flattened_player_data function."""
-    
+
     def test_create_flattened_data(self):
         """Test creating flattened data from raw player data."""
         raw_data = {
@@ -184,10 +181,7 @@ class TestCreateFlattenedPlayerData:
             "duoVictories": 25,
             "bestRoboRumbleTime": 300,
             "bestTimeAsBigBrawler": 600,
-            "club": {
-                "name": "Test Club",
-                "tag": "#CLUB123"
-            },
+            "club": {"name": "Test Club", "tag": "#CLUB123"},
             "brawlers": [
                 {
                     "id": 1,
@@ -195,7 +189,7 @@ class TestCreateFlattenedPlayerData:
                     "power": 11,
                     "rank": 25,
                     "trophies": 500,
-                    "highestTrophies": 600
+                    "highestTrophies": 600,
                 },
                 {
                     "id": 2,
@@ -203,13 +197,13 @@ class TestCreateFlattenedPlayerData:
                     "power": 9,
                     "rank": 20,
                     "trophies": 400,
-                    "highestTrophies": 450
-                }
-            ]
+                    "highestTrophies": 450,
+                },
+            ],
         }
-        
+
         flattened = create_flattened_player_data(raw_data)
-        
+
         assert flattened.tag == "#PLAYER123"
         assert flattened.name == "TestPlayer"
         assert flattened.total_brawlers == 2
@@ -217,7 +211,7 @@ class TestCreateFlattenedPlayerData:
         assert flattened.total_brawler_trophies == 900  # 500 + 400
         assert flattened.club_name == "Test Club"
         assert flattened.club_tag == "#CLUB123"
-    
+
     def test_create_flattened_data_no_club(self):
         """Test creating flattened data for player without club."""
         raw_data = {
@@ -227,11 +221,11 @@ class TestCreateFlattenedPlayerData:
             "highestTrophies": 1200,
             "expLevel": 50,
             "expPoints": 50000,
-            "brawlers": []
+            "brawlers": [],
         }
-        
+
         flattened = create_flattened_player_data(raw_data)
-        
+
         assert flattened.tag == "#PLAYER123"
         assert flattened.club_name == ""
         assert flattened.club_tag == ""
@@ -242,7 +236,7 @@ class TestCreateFlattenedPlayerData:
 
 class TestModelSerialization:
     """Test model serialization and deserialization."""
-    
+
     def test_player_data_serialization(self):
         """Test PlayerData model serialization."""
         player_data = {
@@ -252,16 +246,16 @@ class TestModelSerialization:
             "highestTrophies": 1200,
             "expLevel": 50,
             "expPoints": 50000,
-            "brawlers": []
+            "brawlers": [],
         }
-        
+
         player = PlayerData.model_validate(player_data)
         serialized = player.model_dump()
-        
+
         assert serialized["tag"] == "#PLAYER123"
         assert serialized["name"] == "TestPlayer"
         assert serialized["trophies"] == 1000
-    
+
     def test_flattened_data_json_serialization(self):
         """Test FlattenedPlayerData JSON serialization."""
         flattened_data = {
@@ -282,13 +276,13 @@ class TestModelSerialization:
             "total_brawlers": 5,
             "maxed_brawlers": 2,
             "total_brawler_trophies": 2500,
-            "extracted_at": datetime.now()
+            "extracted_at": datetime.now(),
         }
-        
+
         flattened = FlattenedPlayerData.model_validate(flattened_data)
         json_data = flattened.model_dump_json()
-        
+
         # Verify JSON can be parsed back
         parsed = FlattenedPlayerData.model_validate_json(json_data)
         assert parsed.tag == "#PLAYER123"
-        assert parsed.name == "TestPlayer" 
+        assert parsed.name == "TestPlayer"

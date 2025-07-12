@@ -7,31 +7,33 @@ from typing import Dict, Any
 from .models import PlayerData, FlattenedPlayerData, create_flattened_player_data
 
 
-def save_player_data(data: dict, player_tag: str, base_dir: str = "data/ingested") -> str:
+def save_player_data(
+    data: dict, player_tag: str, base_dir: str = "data/ingested"
+) -> str:
     """
     Save player data to JSON file with Pydantic validation.
-    
+
     Args:
         data: Raw player data from Brawl Stars API
         player_tag: Player tag identifier
         base_dir: Base directory for data storage
-        
+
     Returns:
         Path to saved JSON file
     """
     # Validate data with Pydantic model
     player_data = PlayerData.model_validate(data)
-    
+
     today = datetime.today().strftime("%Y-%m-%d")
     dir_path = os.path.join(base_dir, player_tag, today)
     os.makedirs(dir_path, exist_ok=True)
-    
+
     file_path = os.path.join(dir_path, "player.json")
-    
+
     # Save validated data as JSON
     with open(file_path, "w") as f:
         json.dump(player_data.model_dump(), f, indent=2)
-    
+
     print(f"Data are saved in: {file_path}")
     return file_path
 
@@ -39,10 +41,10 @@ def save_player_data(data: dict, player_tag: str, base_dir: str = "data/ingested
 def flatten_player_data(data: Dict[str, Any]) -> FlattenedPlayerData:
     """
     Flatten player data to extract only essential fields using Pydantic validation.
-    
+
     Args:
         data: Raw player data from Brawl Stars API
-        
+
     Returns:
         FlattenedPlayerData instance with validated and flattened data
     """
@@ -63,11 +65,11 @@ def convert_json_to_parquet(ingested_base_dir="data/ingested", raw_base_dir="dat
                 continue
 
             # Read JSON and flatten data with Pydantic validation
-            with open(json_file, 'r') as f:
+            with open(json_file, "r") as f:
                 raw_data = json.load(f)
-            
+
             flattened_data = flatten_player_data(raw_data)
-            
+
             # Convert to DataFrame using model_dump()
             df = pl.DataFrame([flattened_data.model_dump()])
 

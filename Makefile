@@ -14,7 +14,7 @@ run-player-raw:
 
 run-player-processed:
 	@echo "Display processed player data"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --player-tag $(PLAYER_TAG)
 
 test:
 	@echo "Running all tests..."

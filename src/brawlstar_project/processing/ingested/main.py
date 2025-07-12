@@ -27,5 +27,6 @@ def main():
 
     save_player_data(data, player.tag)
 
+
 if __name__ == "__main__":
     main()
