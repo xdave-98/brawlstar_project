@@ -4,3 +4,12 @@ repos:
     hooks:
       - id: ruff
         args: ["."]
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: Run tests
+        entry: make run-test
+        language: system
+        types: [python]
+
