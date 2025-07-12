@@ -117,7 +117,7 @@ class TestSavePlayerData:
 
             @save_json_decorator(base_dir=temp_dir, filename="player.json")
             def temp_save_player_data(data, player_tag):
-                from brawlstar_project.player.player_models import PlayerData
+                from brawlstar_project.player.models.player import PlayerData
 
                 player_data = PlayerData.model_validate(data)
                 return player_data.model_dump()

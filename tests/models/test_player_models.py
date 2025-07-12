@@ -6,7 +6,7 @@ from datetime import datetime
 
 import pytest
 
-from brawlstar_project.player.player_models import (
+from brawlstar_project.player.models.player import (
     Brawler,
     Club,
     FlattenedPlayerData,
