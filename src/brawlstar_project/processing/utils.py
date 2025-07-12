@@ -4,64 +4,49 @@ from datetime import datetime
 import polars as pl
 from pathlib import Path
 from typing import Dict, Any
+from .models import PlayerData, FlattenedPlayerData, create_flattened_player_data
 
 
 def save_player_data(data: dict, player_tag: str, base_dir: str = "data/ingested") -> str:
+    """
+    Save player data to JSON file with Pydantic validation.
+    
+    Args:
+        data: Raw player data from Brawl Stars API
+        player_tag: Player tag identifier
+        base_dir: Base directory for data storage
+        
+    Returns:
+        Path to saved JSON file
+    """
+    # Validate data with Pydantic model
+    player_data = PlayerData.model_validate(data)
+    
     today = datetime.today().strftime("%Y-%m-%d")
-
     dir_path = os.path.join(base_dir, player_tag, today)
-
     os.makedirs(dir_path, exist_ok=True)
-
+    
     file_path = os.path.join(dir_path, "player.json")
-
+    
+    # Save validated data as JSON
     with open(file_path, "w") as f:
-        json.dump(data, f, indent=2)
-
+        json.dump(player_data.model_dump(), f, indent=2)
+    
     print(f"Data are saved in: {file_path}")
     return file_path
 
 
-def flatten_player_data(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Flatten player data to extract only essential fields.
+def flatten_player_data(data: Dict[str, Any]) -> FlattenedPlayerData:
+    """
+    Flatten player data to extract only essential fields using Pydantic validation.
     
     Args:
         data: Raw player data from Brawl Stars API
         
     Returns:
-        Flattened dictionary with only essential fields
+        FlattenedPlayerData instance with validated and flattened data
     """
-    flattened = {
-        # Basic player info
-        "tag": data.get("tag", ""),
-        "name": data.get("name", ""),
-        "nameColor": data.get("nameColor", ""),
-        "trophies": data.get("trophies", 0),
-        "highestTrophies": data.get("highestTrophies", 0),
-        "expLevel": data.get("expLevel", 0),
-        "expPoints": data.get("expPoints", 0),
-        
-        # Battle statistics
-        "3vs3Victories": data.get("3vs3Victories", 0),
-        "soloVictories": data.get("soloVictories", 0),
-        "duoVictories": data.get("duoVictories", 0),
-        "bestRoboRumbleTime": data.get("bestRoboRumbleTime", 0),
-        "bestTimeAsBigBrawler": data.get("bestTimeAsBigBrawler", 0),
-        
-        # Club info (if exists)
-        "club_name": data.get("club", {}).get("name", ""),
-        "club_tag": data.get("club", {}).get("tag", ""),
-        
-        # Brawler summary
-        "total_brawlers": len(data.get("brawlers", [])),
-        "maxed_brawlers": sum(1 for b in data.get("brawlers", []) if b.get("power", 0) == 11),
-        "total_brawler_trophies": sum(b.get("trophies", 0) for b in data.get("brawlers", [])),
-        
-        # Timestamp
-        "extracted_at": datetime.now().isoformat()
-    }
-    
-    return flattened
+    return create_flattened_player_data(data)
 
 
 def convert_json_to_parquet(ingested_base_dir="data/ingested", raw_base_dir="data/raw"):
@@ -77,14 +62,14 @@ def convert_json_to_parquet(ingested_base_dir="data/ingested", raw_base_dir="dat
                 print(f"Missing player.json in {date_dir}")
                 continue
 
-            # Read JSON and flatten data
+            # Read JSON and flatten data with Pydantic validation
             with open(json_file, 'r') as f:
                 raw_data = json.load(f)
             
             flattened_data = flatten_player_data(raw_data)
             
-            # Convert to DataFrame
-            df = pl.DataFrame([flattened_data])
+            # Convert to DataFrame using model_dump()
+            df = pl.DataFrame([flattened_data.model_dump()])
 
             # Build output path identical to data/raw
             out_dir = Path(raw_base_dir) / player_dir.name / date_dir.name

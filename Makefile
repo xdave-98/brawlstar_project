@@ -12,8 +12,23 @@ run-player-raw:
 	@echo "Convert json file to parquet"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/raw/main.py
 
-run-test:
+run-player-processed:
+	@echo "Display processed player data"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py
+
+test:
+	@echo "Running all tests..."
 	PYTHONPATH=src uv run pytest
+
+test-pydantic:
+	@echo "Running Pydantic model tests..."
+	PYTHONPATH=src uv run pytest tests/test_pydantic_models.py -v
+
+test-coverage:
+	@echo "Running tests with coverage..."
+	PYTHONPATH=src uv run pytest --cov=src/brawlstar_project --cov-report=html --cov-report=term
+
+run-test: test
 
 lint:
 	uv run ruff check .
