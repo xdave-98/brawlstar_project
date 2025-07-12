@@ -86,7 +86,7 @@ def save_player_data(data: dict, player_tag: str) -> dict:
     Returns:
         Validated player data dict
     """
-    from brawlstar_project.player.models.player import PlayerData
+    from brawlstar_project.entities.player.models.player import PlayerData
 
     # Validate data with Pydantic model
     player_data = PlayerData.model_validate(data)
@@ -105,7 +105,7 @@ def save_battlelog_data(data: dict, player_tag: str) -> dict:
     Returns:
         Validated battlelog data dict
     """
-    from brawlstar_project.player.models.battlelog import BattlelogData
+    from brawlstar_project.entities.player.models.battlelog import BattlelogData
 
     # Validate data with Pydantic model
     battlelog_data = BattlelogData.model_validate(data)
@@ -199,7 +199,9 @@ def flatten_player_data(data: dict) -> pl.DataFrame:
     Returns:
         Polars DataFrame with a single row (flattened player data)
     """
-    from brawlstar_project.player.models.player import create_flattened_player_data
+    from brawlstar_project.entities.player.models.player import (
+        create_flattened_player_data,
+    )
 
     flattened = create_flattened_player_data(data)
     return pl.DataFrame([flattened.model_dump()])

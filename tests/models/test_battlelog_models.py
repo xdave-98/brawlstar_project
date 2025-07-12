@@ -6,7 +6,7 @@ from datetime import datetime
 
 import pytest
 
-from brawlstar_project.player.models.battlelog import (
+from brawlstar_project.entities.player.models.battlelog import (
     Battle,
     BattleDetails,
     BattleEvent,

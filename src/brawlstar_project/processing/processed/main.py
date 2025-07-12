@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from brawlstar_project.player.player import Player
+from brawlstar_project.entities.player.player import Player
 from brawlstar_project.processing.processed.analysis import (
     BattlelogAnalysis,
 )
@@ -43,9 +43,9 @@ def main():
         # Create battlelog analysis and count battles
         battlelog_analysis = BattlelogAnalysis(battlelog_df)
         total_battles = battlelog_analysis.count_total_battles()
-        
+
         print(f"✅ Loaded {total_battles} battles from Parquet files")
-        
+
         # Display comprehensive battle statistics
         battlelog_analysis.display_battle_stats()
 

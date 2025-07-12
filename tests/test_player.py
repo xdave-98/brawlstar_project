@@ -1,6 +1,6 @@
 import pytest
 
-from brawlstar_project.player.player import Player
+from brawlstar_project.entities.player.player import Player
 
 
 def test_tag_auto_hash():
