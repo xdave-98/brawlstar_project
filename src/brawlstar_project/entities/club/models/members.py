@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 class PlayerIcon(BaseModel):
     """Model for player icon information."""
-    
+
     id: int = Field(description="Player icon ID")
 
 
