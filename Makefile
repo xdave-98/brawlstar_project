@@ -8,6 +8,9 @@ run-player:
 	@echo "Get player tag: $(PLAYER_TAG)"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/raw/main.py $(PLAYER_TAG)
 
+run-test:
+	PYTHONPATH=src uv run pytest
+
 lint:
 	uv run ruff check .
 
