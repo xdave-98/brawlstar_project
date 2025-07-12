@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from brawlstar_project.entities.club import Club
 from brawlstar_project.entities.player import Player
 from brawlstar_project.processing.processed.analysis import (
     BattlelogAnalysis,
@@ -13,6 +14,7 @@ def main():
         description="Display Brawl Stars player data from Parquet files"
     )
     parser.add_argument("--player-tag", required=True, help="Player tag to analyze")
+    parser.add_argument("--club-tag", help="Club tag to analyze")
     parser.add_argument(
         "--data-dir", default="data", help="Directory containing data files"
     )
@@ -52,6 +54,19 @@ def main():
 
         # Display comprehensive battle statistics
         battlelog_analysis.display_battle_stats()
+
+    # Load and analyze club data if club tag is provided
+    if args.club_tag:
+        print(f"\n🏛️ Loading club data for {args.club_tag}...")
+        club = Club(args.club_tag)
+        club_df = club.load_club_data(Path(args.data_dir) / "raw", args.days)
+
+        if club_df is None or club_df.is_empty():
+            print("❌ No club data found!")
+        else:
+            print(f"✅ Loaded {len(club_df)} club records from Parquet files")
+            print(club_df)
+            print("Should show")
 
     print("🎉 Analysis complete!")
 

@@ -113,6 +113,42 @@ def save_battlelog_data(data: dict, player_tag: str) -> dict:
     return battlelog_data.model_dump()
 
 
+@save_json_decorator(base_dir="data/ingested", filename="club.json")
+def save_club_data(data: dict, club_tag: str) -> dict:
+    """
+    Validate and save club data.
+
+    Args:
+        data: Raw club data from Brawl Stars API
+        club_tag: Club tag identifier
+
+    Returns:
+        Validated club data dict
+    """
+    from brawlstar_project.entities.club.models.club import ClubData
+
+    club_data = ClubData.model_validate(data)
+    return club_data.model_dump()
+
+
+@save_json_decorator(base_dir="data/ingested", filename="club_members.json")
+def save_club_members_data(data: dict, club_tag: str) -> dict:
+    """
+    Validate and save club members data.
+
+    Args:
+        data: Raw club members data from Brawl Stars API
+        club_tag: Club tag identifier
+
+    Returns:
+        Validated club members data dict
+    """
+    from brawlstar_project.entities.club.models.members import ClubMembersData
+
+    club_members_data = ClubMembersData.model_validate(data)
+    return club_members_data.model_dump()
+
+
 def convert_json_to_parquet_generic(
     ingested_base_dir: str,
     raw_base_dir: str,
@@ -246,6 +282,22 @@ def convert_all_json_to_parquet(
         flatten_func=flatten_battlelog_data,
     )
 
+    convert_jsons_to_parquet_per_date(
+        ingested_base_dir=ingested_base_dir,
+        raw_base_dir=raw_base_dir,
+        json_filename="club.json",
+        parquet_filename="club.parquet",
+        flatten_func=flatten_club_data,
+    )
+
+    convert_jsons_to_parquet_per_date(
+        ingested_base_dir=ingested_base_dir,
+        raw_base_dir=raw_base_dir,
+        json_filename="club_members.json",
+        parquet_filename="club_members.parquet",
+        flatten_func=flatten_club_members_data,
+    )
+
 
 def flatten_player_data(data: dict) -> pl.DataFrame:
     """
@@ -293,4 +345,40 @@ def flatten_battlelog_data(data: dict) -> pl.DataFrame:
             )
         )
 
+    return df
+
+
+def flatten_club_data(data: dict) -> pl.DataFrame:
+    """
+    Flatten club data to a Polars DataFrame.
+
+    Args:
+        data: Raw club data dict
+
+    Returns:
+        Polars DataFrame with a single row (flattened club data)
+    """
+    from brawlstar_project.entities.club.models.club import (
+        create_flattened_club_data,
+    )
+
+    flattened = create_flattened_club_data(data)
+    return pl.DataFrame([flattened.model_dump()])
+
+
+def flatten_club_members_data(data: dict) -> pl.DataFrame:
+    """
+    Flatten club members data to a Polars DataFrame.
+
+    Args:
+        data: Raw club members data dict (with "items" key)
+
+    Returns:
+        Polars DataFrame with normalized club members info
+    """
+    members = data.get("items", [])
+    if not members:
+        return pl.DataFrame()
+
+    df = pl.DataFrame(members)
     return df

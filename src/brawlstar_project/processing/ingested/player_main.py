@@ -24,7 +24,7 @@ def main():
     config = ConfigLoader.from_env()
     client = BrawlStarsClient(api_key=config.api_key, base_url=config.base_url)
 
-    # Instanciate Player
+    # Instantiate Player
     player = Player(args.player_tag)
 
     # Get player and player battlelog data

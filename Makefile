@@ -5,8 +5,14 @@
 # Default player tag (you should put your own player tag here)
 DEFAULT_PLAYER_TAG = "PC0PPLRU"
 
+# Default club tag (you should put your own club tag here)
+DEFAULT_CLUB_TAG = "80Y22P29J"
+
 # Use PLAYER_TAG from command line if defined, else use default
 PLAYER_TAG ?= $(DEFAULT_PLAYER_TAG)
+
+# Use CLUB_TAG from command line if defined, else use default
+CLUB_TAG ?= $(DEFAULT_CLUB_TAG)
 
 # ============================================================================
 # ETL Pipeline Commands
@@ -14,7 +20,7 @@ PLAYER_TAG ?= $(DEFAULT_PLAYER_TAG)
 
 run-player-ingestion:
 	@echo "🔷 Ingest player data for tag: $(PLAYER_TAG)"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/main.py $(PLAYER_TAG)
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/player_main.py $(PLAYER_TAG)
 
 run-player-raw:
 	@echo "🔷 Convert JSON files to Parquet"
@@ -23,6 +29,10 @@ run-player-raw:
 run-player-processed:
 	@echo "🔷 Display processed player data"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --player-tag $(PLAYER_TAG)
+
+run-club-ingestion:
+	@echo "🔷 Ingest club data for tag: $(CLUB_TAG)"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/club_main.py $(CLUB_TAG)
 
 # ============================================================================
 # Tests

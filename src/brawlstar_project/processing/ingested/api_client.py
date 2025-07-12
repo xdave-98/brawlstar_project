@@ -43,6 +43,21 @@ class BrawlStarsClient:
         resp.raise_for_status()
         return resp.json()
 
+    def get_club(self, club_tag: str) -> dict:
+        """
+        Fetch club information from the Brawl Stars API.
+
+        Args:
+            club_tag: Brawl Stars club tag (without #)
+
+        Returns:
+            Parsed JSON response as a Python dictionary.
+        """
+        url = f"{self.base_url}/clubs/{club_tag}"
+        resp = requests.get(url, headers=self.headers)
+        resp.raise_for_status()
+        return resp.json()
+
     def get_club_members(self, club_tag: str) -> dict:
         """
         Fetch the list of members of a given club.
