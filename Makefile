@@ -18,11 +18,15 @@ CLUB_TAG ?= $(DEFAULT_CLUB_TAG)
 # ETL Pipeline Commands
 # ============================================================================
 
-run-player-ingestion:
+run-player-ingestion-stage:
 	@echo "🔷 Ingest player data for tag: $(PLAYER_TAG)"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/player_main.py $(PLAYER_TAG)
 
-run-player-raw:
+run-club-ingestion-stage:
+	@echo "🔷 Ingest club data for tag: $(CLUB_TAG)"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/club_main.py $(CLUB_TAG)
+
+run-raw-stage:
 	@echo "🔷 Convert JSON files to Parquet"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/raw/main.py
 
@@ -30,9 +34,9 @@ run-player-processed:
 	@echo "🔷 Display processed player data"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --player-tag $(PLAYER_TAG)
 
-run-club-ingestion:
-	@echo "🔷 Ingest club data for tag: $(CLUB_TAG)"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/club_main.py $(CLUB_TAG)
+run-processed-stage:
+	@echo "🔷 Show all processed data (player and club)"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --player-tag $(PLAYER_TAG) --club-tag $(CLUB_TAG)
 
 # ============================================================================
 # Tests

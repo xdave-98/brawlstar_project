@@ -376,9 +376,9 @@ def flatten_club_members_data(data: dict) -> pl.DataFrame:
     Returns:
         Polars DataFrame with normalized club members info
     """
-    members = data.get("items", [])
-    if not members:
-        return pl.DataFrame()
+    from brawlstar_project.entities.club.models.members import (
+        create_flattened_club_members_data,
+    )
 
-    df = pl.DataFrame(members)
-    return df
+    flattened = create_flattened_club_members_data(data)
+    return pl.DataFrame(flattened.items)

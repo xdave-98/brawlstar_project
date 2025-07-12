@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-from typing import Optional
 
 import polars as pl
 
@@ -16,10 +15,8 @@ class Player(TagEntity):
                 "Player tag must contain only uppercase letters A-Z and digits 0-9"
             )
 
-    def load_player_data(self, base_dir: Path, days: int = 1) -> Optional[pl.DataFrame]:
-        return self._load_data(base_dir, "player.parquet", days)
+    def load_player_data(self, base_dir: Path, days: int = 1) -> pl.DataFrame:
+        return self._load_past_days_data(base_dir, "player.parquet", days)
 
-    def load_battlelog_data(
-        self, base_dir: Path, days: int = 1
-    ) -> Optional[pl.DataFrame]:
-        return self._load_data(base_dir, "battlelog.parquet", days)
+    def load_battlelog_data(self, base_dir: Path, days: int = 1) -> pl.DataFrame:
+        return self._load_past_days_data(base_dir, "battlelog.parquet", days)
