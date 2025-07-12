@@ -1,9 +1,12 @@
 import argparse
 
-from brawlstar_project.processing.ingested.config import ConfigLoader
-from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
 from brawlstar_project.player.player import Player
-from brawlstar_project.processing.utils import save_player_data, save_battlelog_data
+from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
+from brawlstar_project.processing.ingested.config import ConfigLoader
+from brawlstar_project.processing.utils import (
+    save_battlelog_data,
+    save_player_data,
+)
 
 
 def main():

@@ -4,11 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "brawlstar_project"
-version = "0.1.0"
-description = "Brawl Stars data analysis project using Polars and Iceberg"
+version = "0.2.0"
+description = "Brawl Stars data analysis project using Polars"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "isort>=6.0.1",
     "polars>=1.31.0",
     "pre-commit>=4.2.0",
     "pydantic>=2.11.7",
@@ -28,3 +29,11 @@ packages = ["brawlstar_project"]
 
 [tool.hatch.build]
 source-directory = "src"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.ruff]
+line-length = 88

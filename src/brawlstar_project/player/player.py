@@ -1,8 +1,9 @@
+import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-import re
 from typing import Optional
+
 import polars as pl
 
 
@@ -30,7 +31,9 @@ class Player:
     def formatted_tag(self) -> str:
         return self.tag.replace("#", "%23")
 
-    def _load_data(self, base_dir: Path, filename: str, days: int) -> Optional[pl.DataFrame]:
+    def _load_data(
+        self, base_dir: Path, filename: str, days: int
+    ) -> Optional[pl.DataFrame]:
         dfs = []
         today = datetime.today()
         for i in range(days):
@@ -46,5 +49,7 @@ class Player:
     def load_player_data(self, base_dir: Path, days: int = 1) -> Optional[pl.DataFrame]:
         return self._load_data(base_dir, "player.parquet", days)
 
-    def load_battlelog_data(self, base_dir: Path, days: int = 1) -> Optional[pl.DataFrame]:
+    def load_battlelog_data(
+        self, base_dir: Path, days: int = 1
+    ) -> Optional[pl.DataFrame]:
         return self._load_data(base_dir, "battlelog.parquet", days)

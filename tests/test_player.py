@@ -1,4 +1,5 @@
 import pytest
+
 from brawlstar_project.player.player import Player
 
 

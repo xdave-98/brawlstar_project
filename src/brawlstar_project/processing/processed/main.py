@@ -1,5 +1,6 @@
-from pathlib import Path
 import argparse
+from pathlib import Path
+
 from brawlstar_project.player.player import Player
 
 
@@ -28,14 +29,14 @@ def main():
 
     print(f"✅ Loaded {len(df)} records from Parquet files")
 
-    print(df)    
+    print(df)
     print("Should show")
 
     # Display various analyses
-    #player_analysis = PlayerAnalysis(df)
-    #player_analysis.display_basic_stats()
+    # player_analysis = PlayerAnalysis(df)
+    # player_analysis.display_basic_stats()
 
-    #print("🎉 Analysis complete!")
+    # print("🎉 Analysis complete!")
 
 
 if __name__ == "__main__":

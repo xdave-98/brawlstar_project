@@ -1,9 +1,9 @@
-import os
 import json
+import os
 from datetime import datetime
+from functools import wraps
 from pathlib import Path
 from typing import Callable, Optional
-from functools import wraps
 
 import polars as pl
 
@@ -47,14 +47,15 @@ def save_json_data(
 def save_json_decorator(base_dir: str = "data/ingested", filename: str = "data.json"):
     """
     Decorator to save JSON data with consistent parameters.
-    
+
     Args:
         base_dir: Base directory for data storage
         filename: JSON filename
-    
+
     Returns:
         Decorated function that saves data to JSON
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(data: dict, player_tag: str, **kwargs) -> str:
@@ -65,9 +66,11 @@ def save_json_decorator(base_dir: str = "data/ingested", filename: str = "data.j
                 player_tag=player_tag,
                 base_dir=base_dir,
                 filename=filename,
-                **kwargs
+                **kwargs,
             )
+
         return wrapper
+
     return decorator
 
 
@@ -75,16 +78,16 @@ def save_json_decorator(base_dir: str = "data/ingested", filename: str = "data.j
 def save_player_data(data: dict, player_tag: str) -> dict:
     """
     Validate and save player data.
-    
+
     Args:
         data: Raw player data from Brawl Stars API
         player_tag: Player tag identifier
-        
+
     Returns:
         Validated player data dict
     """
     from brawlstar_project.player.player_models import PlayerData
-    
+
     # Validate data with Pydantic model
     player_data = PlayerData.model_validate(data)
     return player_data.model_dump()
@@ -94,16 +97,16 @@ def save_player_data(data: dict, player_tag: str) -> dict:
 def save_battlelog_data(data: dict, player_tag: str) -> dict:
     """
     Validate and save battlelog data.
-    
+
     Args:
         data: Raw battlelog data from Brawl Stars API
         player_tag: Player tag identifier
-        
+
     Returns:
         Validated battlelog data dict
     """
     from brawlstar_project.player.battlelog_models import BattlelogData
-    
+
     # Validate data with Pydantic model
     battlelog_data = BattlelogData.model_validate(data)
     return battlelog_data.model_dump()
@@ -142,7 +145,7 @@ def convert_json_to_parquet_generic(
                 raw_data = json.load(f)
 
             df = flatten_func(raw_data)
-            
+
             # Skip if DataFrame is empty
             if df.is_empty():
                 print(f"No data to convert in {json_file}")
@@ -157,10 +160,12 @@ def convert_json_to_parquet_generic(
             print(f"Converted {json_file} to {parquet_file}")
 
 
-def convert_all_json_to_parquet(ingested_base_dir: str = "data/ingested", raw_base_dir: str = "data/raw"):
+def convert_all_json_to_parquet(
+    ingested_base_dir: str = "data/ingested", raw_base_dir: str = "data/raw"
+):
     """
     Convert all JSON files (player and battlelog) to Parquet files.
-    
+
     Args:
         ingested_base_dir: Base directory where JSON data is stored
         raw_base_dir: Base directory to write Parquet files
@@ -171,16 +176,16 @@ def convert_all_json_to_parquet(ingested_base_dir: str = "data/ingested", raw_ba
         raw_base_dir=raw_base_dir,
         json_filename="player.json",
         parquet_filename="player.parquet",
-        flatten_func=flatten_player_data
+        flatten_func=flatten_player_data,
     )
-    
+
     # Convert battlelog data
     convert_json_to_parquet_generic(
         ingested_base_dir=ingested_base_dir,
         raw_base_dir=raw_base_dir,
         json_filename="battlelog.json",
         parquet_filename="battlelog.parquet",
-        flatten_func=flatten_battlelog_data
+        flatten_func=flatten_battlelog_data,
     )
 
 
