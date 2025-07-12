@@ -1,5 +1,12 @@
-run:
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/raw/main.py
+# Default player tag (You should put your player_tag)
+DEFAULT_PLAYER_TAG = "PC0PPLRU"
+
+# Use PLAYER_TAG from command line if defined, else use default
+PLAYER_TAG ?= $(DEFAULT_PLAYER_TAG)
+
+run-player:
+	@echo "Get player tag: $(PLAYER_TAG)"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/raw/main.py $(PLAYER_TAG)
 
 lint:
 	uv run ruff check .
