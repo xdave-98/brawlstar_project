@@ -4,7 +4,7 @@ from datetime import datetime
 import polars as pl
 from pathlib import Path
 from typing import Dict, Any
-from .models import PlayerData, FlattenedPlayerData, create_flattened_player_data
+from brawlstar_project.player.models import PlayerData, FlattenedPlayerData, create_flattened_player_data
 
 
 def save_player_data(
