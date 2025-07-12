@@ -2,6 +2,9 @@ import argparse
 from pathlib import Path
 
 from brawlstar_project.player.player import Player
+from brawlstar_project.processing.processed.analysis import (
+    BattlelogAnalysis,
+)
 
 
 def main():
@@ -11,7 +14,7 @@ def main():
     )
     parser.add_argument("--player-tag", required=True, help="Player tag to analyze")
     parser.add_argument(
-        "--data-dir", default="data/raw", help="Directory containing Parquet files"
+        "--data-dir", default="data", help="Directory containing data files"
     )
     parser.add_argument("--days", type=int, default=7, help="Number of days to load")
 
@@ -21,22 +24,32 @@ def main():
 
     # Create Player instance and load data
     player = Player(args.player_tag)
-    df = player.load_player_data(Path(args.data_dir), args.days)
+    df = player.load_player_data(Path(args.data_dir) / "raw", args.days)
 
     if df is None or df.is_empty():
-        print("❌ No data found!")
-        return
+        print("❌ No player data found!")
+    else:
+        print(f"✅ Loaded {len(df)} player records from Parquet files")
+        print(df)
+        print("Should show")
 
-    print(f"✅ Loaded {len(df)} records from Parquet files")
+    # Load and analyze battlelog data
+    print(f"\n⚔️ Loading battlelog data for {args.player_tag}...")
+    battlelog_df = player.load_battlelog_data(Path(args.data_dir) / "raw", args.days)
 
-    print(df)
-    print("Should show")
+    if battlelog_df is None or battlelog_df.is_empty():
+        print("❌ No battlelog data found!")
+    else:
+        # Create battlelog analysis and count battles
+        battlelog_analysis = BattlelogAnalysis(battlelog_df)
+        total_battles = battlelog_analysis.count_total_battles()
+        
+        print(f"✅ Loaded {total_battles} battles from Parquet files")
+        
+        # Display comprehensive battle statistics
+        battlelog_analysis.display_battle_stats()
 
-    # Display various analyses
-    # player_analysis = PlayerAnalysis(df)
-    # player_analysis.display_basic_stats()
-
-    # print("🎉 Analysis complete!")
+    print("🎉 Analysis complete!")
 
 
 if __name__ == "__main__":

@@ -35,3 +35,63 @@ class PlayerAnalysis:
         print(
             f"   Average brawler trophies: {self.player_df['total_brawler_trophies'].mean():.0f}"
         )
+
+
+@dataclass
+class BattlelogAnalysis:
+    battlelog_df: pl.DataFrame
+
+    def count_total_battles(self) -> int:
+        """
+        Count total number of battles in the battlelog DataFrame.
+
+        Returns:
+            Total number of battles
+        """
+        return len(self.battlelog_df)
+
+    def count_battles_by_mode(self) -> pl.DataFrame:
+        """
+        Count battles grouped by battle mode.
+
+        Returns:
+            DataFrame with mode and count columns
+        """
+        return self.battlelog_df.group_by("battle_mode").agg(
+            pl.count().alias("battle_count")
+        )
+
+    def count_battles_by_result(self) -> pl.DataFrame:
+        """
+        Count battles grouped by result (victory/defeat).
+
+        Returns:
+            DataFrame with result and count columns
+        """
+        return self.battlelog_df.group_by("battle_result").agg(
+            pl.count().alias("battle_count")
+        )
+
+    def count_battles_by_brawler(self) -> pl.DataFrame:
+        """
+        Count battles grouped by brawler used.
+
+        Returns:
+            DataFrame with brawler_name and count columns
+        """
+        return self.battlelog_df.group_by("brawler_name").agg(
+            pl.count().alias("battle_count")
+        )
+
+    def display_battle_stats(self) -> None:
+        """Display comprehensive battle statistics."""
+        print("=" * 60)
+        print("⚔️ BATTLE STATISTICS")
+        print("=" * 60)
+
+        total_battles = self.count_total_battles()
+        print(f"📊 Total battles collected: {total_battles}")
+
+        if total_battles == 0:
+            print("❌ No battles found in the data!")
+            return
