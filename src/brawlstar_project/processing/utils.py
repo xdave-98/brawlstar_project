@@ -1,5 +1,6 @@
 import json
 import os
+from collections import defaultdict
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -160,18 +161,76 @@ def convert_json_to_parquet_generic(
             print(f"Converted {json_file} to {parquet_file}")
 
 
-def convert_all_json_to_parquet(
-    ingested_base_dir: str = "data/ingested", raw_base_dir: str = "data/raw"
+def convert_jsons_to_parquet_per_date(
+    ingested_base_dir: str,
+    raw_base_dir: str,
+    json_filename: str,
+    parquet_filename: str,
+    flatten_func: Callable[[dict], pl.DataFrame],
 ):
     """
-    Convert all JSON files (player and battlelog) to Parquet files.
+    Convert JSON files to one Parquet file per date, concatenating all players' data.
 
     Args:
         ingested_base_dir: Base directory where JSON data is stored
         raw_base_dir: Base directory to write Parquet files
+        json_filename: Name of JSON files to read (e.g., "player.json", "battlelog.json")
+        parquet_filename: Name of Parquet file to write (e.g., "player.parquet")
+        flatten_func: Function to convert raw JSON dict to polars.DataFrame
     """
-    # Convert player data
-    convert_json_to_parquet_generic(
+
+    # 1. Recenser tous les dossiers de joueurs et dates pour trouver toutes les dates existantes
+    date_to_files = defaultdict(
+        list
+    )  # dict: date_str -> list of (player_tag, json_file_path)
+    ingested_path = Path(ingested_base_dir)
+
+    for player_dir in ingested_path.iterdir():
+        if not player_dir.is_dir():
+            continue
+        player_tag = player_dir.name
+        for date_dir in player_dir.iterdir():
+            if not date_dir.is_dir():
+                continue
+            date_str = date_dir.name
+            json_file = date_dir / json_filename
+            if json_file.exists():
+                date_to_files[date_str].append((player_tag, json_file))
+
+    # 2. Pour chaque date, concaténer les données de tous les joueurs et écrire un parquet
+    for date_str, files in date_to_files.items():
+        dfs: list[pl.DataFrame] = []
+        for player_tag, json_file in files:
+            with open(json_file, "r") as f:
+                raw_data = json.load(f)
+
+            df = flatten_func(raw_data)
+
+            if df.is_empty():
+                print(f"No data in {json_file}, skipping")
+                continue
+
+            dfs.append(df)
+
+        if not dfs:
+            print(f"No valid data for date {date_str}, skipping")
+            continue
+
+        all_data_df = pl.concat(dfs)
+
+        out_dir = Path(raw_base_dir) / date_str
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        parquet_file = out_dir / parquet_filename
+        all_data_df.write_parquet(parquet_file)
+
+        print(f"Written consolidated parquet for date {date_str}: {parquet_file}")
+
+
+def convert_all_json_to_parquet(
+    ingested_base_dir: str = "data/ingested", raw_base_dir: str = "data/raw"
+):
+    convert_jsons_to_parquet_per_date(
         ingested_base_dir=ingested_base_dir,
         raw_base_dir=raw_base_dir,
         json_filename="player.json",
@@ -179,8 +238,7 @@ def convert_all_json_to_parquet(
         flatten_func=flatten_player_data,
     )
 
-    # Convert battlelog data
-    convert_json_to_parquet_generic(
+    convert_jsons_to_parquet_per_date(
         ingested_base_dir=ingested_base_dir,
         raw_base_dir=raw_base_dir,
         json_filename="battlelog.json",

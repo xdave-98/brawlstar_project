@@ -16,7 +16,7 @@ def main():
     parser.add_argument(
         "--data-dir", default="data", help="Directory containing data files"
     )
-    parser.add_argument("--days", type=int, default=7, help="Number of days to load")
+    parser.add_argument("--days", type=int, default=1, help="Number of days to load")
 
     args = parser.parse_args()
 
@@ -40,6 +40,10 @@ def main():
     if battlelog_df is None or battlelog_df.is_empty():
         print("❌ No battlelog data found!")
     else:
+        print(f"✅ Loaded {len(battlelog_df)} battlelog records from Parquet files")
+        print(battlelog_df)
+        print("Should show")
+
         # Create battlelog analysis and count battles
         battlelog_analysis = BattlelogAnalysis(battlelog_df)
         total_battles = battlelog_analysis.count_total_battles()
