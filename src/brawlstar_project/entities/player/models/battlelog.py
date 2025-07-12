@@ -16,8 +16,10 @@ class BrawlerInBattle(BaseModel):
 
     id: int = Field(description="Brawler ID")
     name: str = Field(description="Brawler name")
-    power: int = Field(description="Brawler power level", ge=1, le=11)
-    trophies: int = Field(description="Brawler trophies", ge=0)
+    power: int = Field(
+        description="Brawler power level", ge=-1, le=11
+    )  # Allow -1 for unknown
+    trophies: int = Field(description="Brawler trophies", ge=-1)  # Allow -1 for unknown
 
 
 class BattlePlayer(BaseModel):
@@ -41,7 +43,7 @@ class BattleEvent(BaseModel):
 
     id: int = Field(description="Event ID")
     mode: str = Field(description="Event mode")
-    map: str = Field(description="Event map")
+    map: Optional[str] = Field(default=None, description="Event map")
 
 
 class BattleDetails(BaseModel):
@@ -49,10 +51,14 @@ class BattleDetails(BaseModel):
 
     mode: str = Field(description="Battle mode")
     type: str = Field(description="Battle type")
-    result: str = Field(description="Battle result")
-    duration: int = Field(description="Battle duration in seconds")
+    result: Optional[str] = Field(default=None, description="Battle result")
+    duration: Optional[int] = Field(
+        default=None, description="Battle duration in seconds"
+    )
     starPlayer: Optional[StarPlayer] = Field(default=None, description="Star player")
-    teams: List[List[BattlePlayer]] = Field(description="Battle teams")
+    teams: Optional[List[List[BattlePlayer]]] = Field(
+        default=None, description="Battle teams"
+    )
 
     model_config = ConfigDict(extra="allow")  # Allow extra fields from API
 
@@ -141,6 +147,10 @@ def create_flattened_battle_data(
         is_star_player = False
 
         # Extract team information
+        team_size = 0
+        opponent_count = 0
+        player_battle_info = None
+
         if battle.battle.teams:
             for team in battle.battle.teams:
                 team_size = len(team)
@@ -170,11 +180,11 @@ def create_flattened_battle_data(
         flattened_dict = {
             "battleTime": battle.battleTime,
             "eventMode": battle.event.mode,
-            "eventMap": battle.event.map,
+            "eventMap": battle.event.map or "unknown",
             "battleMode": battle.battle.mode,
             "battleType": battle.battle.type,
-            "battleResult": battle.battle.result,
-            "battleDuration": battle.battle.duration,
+            "battleResult": battle.battle.result or "unknown",
+            "battleDuration": battle.battle.duration or 0,
             "playerTag": player_tag,
             "playerName": player_battle_info.name if player_battle_info else "",
             "brawlerName": brawler_name,

@@ -28,7 +28,7 @@ class TestSaveJsonData:
             filename = "test.json"
 
             result_path = save_json_data(
-                data=data, player_tag=player_tag, base_dir=temp_dir, filename=filename
+                data=data, tag=player_tag, base_dir=temp_dir, filename=filename
             )
 
             # Check file was created
@@ -54,7 +54,7 @@ class TestSaveJsonData:
 
             result_path = save_json_data(
                 data=data,
-                player_tag=player_tag,
+                tag=player_tag,
                 base_dir=temp_dir,
                 filename="test.json",
                 validate_func=validate_func,

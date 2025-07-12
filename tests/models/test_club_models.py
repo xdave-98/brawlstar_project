@@ -1,4 +1,3 @@
-
 from brawlstar_project.entities.club.models.club import ClubData
 
 

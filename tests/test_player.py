@@ -14,18 +14,30 @@ def test_tag_already_has_hash():
 
 
 def test_tag_invalid_length_too_short():
-    with pytest.raises(ValueError, match="exactly 8 characters"):
+    with pytest.raises(ValueError, match="between 8-9 characters"):
         Player("#A1")
 
 
 def test_tag_invalid_length_too_long():
-    with pytest.raises(ValueError, match="exactly 8 characters"):
+    with pytest.raises(ValueError, match="between 8-9 characters"):
         Player("#ABCDEFGHIJKL")
 
 
 def test_tag_invalid_chars():
     with pytest.raises(ValueError, match="only uppercase letters A-Z and digits"):
         Player("#ABC12*GH")
+
+
+def test_tag_9_characters():
+    """Test that 9-character tags are now accepted."""
+    p = Player("ABCDEFGHI")
+    assert p.tag == "#ABCDEFGHI"
+
+
+def test_tag_8_characters():
+    """Test that 8-character tags are still accepted."""
+    p = Player("ABCDEFGH")
+    assert p.tag == "#ABCDEFGH"
 
 
 def test_formatted_tag():

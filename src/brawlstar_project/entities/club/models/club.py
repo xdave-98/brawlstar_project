@@ -38,14 +38,14 @@ def create_flattened_club_data(club_data: dict) -> "FlattenedClubData":
     # Compute missing fields
     member_count = len(club_data.get("members", []))
     extracted_at = datetime.now().isoformat()
-    
+
     # Create data with computed fields
     flattened_data = {
         **club_data,
         "member_count": member_count,
         "extracted_at": extracted_at,
     }
-    
+
     return FlattenedClubData.model_validate(flattened_data)
 
 

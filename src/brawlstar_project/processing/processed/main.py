@@ -35,7 +35,9 @@ def main():
         print(club_df)
 
         print(f"\n👥 Loading club members data for {args.club_tag}...")
-        club_members_df = club.load_club_members_data(Path(args.data_dir) / "raw", args.days)
+        club_members_df = club.load_club_members_data(
+            Path(args.data_dir) / "raw", args.days
+        )
         print(club_members_df)
 
 
