@@ -1,9 +1,9 @@
 import argparse
 import logging
 
+from brawlstar_project.processing.factory.runner_factory import RunnerFactory
 from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
 from brawlstar_project.processing.ingested.config import ConfigLoader
-from brawlstar_project.processing.ingested.factory import RunnerFactory
 
 # Set up logging
 logging.basicConfig(

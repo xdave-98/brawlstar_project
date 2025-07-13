@@ -20,3 +20,22 @@ class Player(TagEntity):
 
     def load_battlelog_data(self, base_dir: Path, days: int = 1) -> pl.DataFrame:
         return self._load_past_days_data(base_dir, "battlelog.parquet", days)
+
+    @staticmethod
+    def process_player_df(df: pl.DataFrame) -> pl.DataFrame:
+        """Clean and process player DataFrame for silver layer."""
+        columns_to_drop = [
+            "name_color",
+            "best_robo_rumble_time",
+            "best_time_as_big_brawler",
+        ]
+        df = df.drop(columns_to_drop)
+        return df
+
+    @staticmethod
+    def process_battlelog_df(df: pl.DataFrame) -> pl.DataFrame:
+        """Clean and process battlelog DataFrame for silver layer."""
+        # Example: Remove friendlies, drop null events, etc.
+        # df = df.filter(df["battle_type"] != "friendly")
+        # Add more battlelog cleaning steps here
+        return df

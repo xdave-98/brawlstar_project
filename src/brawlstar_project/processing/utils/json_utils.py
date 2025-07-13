@@ -323,7 +323,7 @@ def flatten_player_data(data: dict) -> pl.DataFrame:
 
     try:
         flattened = create_flattened_player_data(data)
-        tag = getattr(flattened, 'tag', None)
+        tag = getattr(flattened, "tag", None)
         if not tag or tag == "#UNKNOWN" or tag == "UNKNOWN":
             logger.warning(f"Player data missing or unknown tag: {tag}")
         return pl.DataFrame([flattened.model_dump()])
@@ -349,7 +349,9 @@ def flatten_battlelog_data(data: dict, player_tag: str = "") -> pl.DataFrame:
 
     try:
         if not player_tag or player_tag == "#UNKNOWN" or player_tag == "UNKNOWN":
-            logger.warning(f"Battlelog data missing or unknown player tag: {player_tag}")
+            logger.warning(
+                f"Battlelog data missing or unknown player tag: {player_tag}"
+            )
         flattened_battles = create_flattened_battle_data(data, player_tag)
         if flattened_battles:
             return pl.DataFrame([battle.model_dump() for battle in flattened_battles])

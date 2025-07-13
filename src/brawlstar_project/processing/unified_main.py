@@ -8,10 +8,9 @@ ingestion, analysis, and other pipeline stages using the factory pattern.
 import argparse
 import logging
 
-from brawlstar_project.processing.factory.analysis_factory import AnalysisFactory
+from brawlstar_project.processing.factory.runner_factory import RunnerFactory
 from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
 from brawlstar_project.processing.ingested.config import ConfigLoader
-from brawlstar_project.processing.ingested.factory.runner_factory import RunnerFactory
 
 # Set up logging
 logging.basicConfig(
@@ -67,39 +66,6 @@ def main():
             logger.error(f"❌ Error: {e}")
             logger.info(f"Available modes: {factory.list_modes()}")
             return
-    elif args.stage == "analysis":
-        run_analysis(args)
-
-
-def run_analysis(args):
-    """Run analysis stage."""
-    logger.info(f"📊 Starting {args.mode} analysis...")
-
-    # Get runner from factory
-    try:
-        factory = AnalysisFactory()
-        runner = factory.get_runner(args.mode)
-
-        # Prepare kwargs based on mode
-        kwargs = {"data_dir": args.data_dir, "days": args.days}
-
-        if args.mode == "single-player":
-            if not args.tag:
-                logger.error("❌ --tag is required for single-player analysis")
-                return
-            kwargs["player_tag"] = args.tag
-        elif args.mode == "club":
-            if not args.tag:
-                logger.error("❌ --tag is required for club analysis")
-                return
-            kwargs["club_tag"] = args.tag
-
-        result = runner.run(**kwargs)
-        logger.info(f"\n📊 Result: {result}")
-    except Exception as e:
-        logger.error(f"❌ Error: {e}")
-        logger.info(f"Available modes: {factory.list_modes()}")
-        return
 
 
 if __name__ == "__main__":

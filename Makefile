@@ -49,6 +49,11 @@ run-club-analysis:
 	@echo "🔷 Run club analysis"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --mode club --club-tag $(CLUB_TAG) --data-dir data
 
+# Process (Cleaning) Command
+run-process:
+	@echo "🔷 Run batch processing (cleaning) for mode: $(MODE) and date: $(DATE)"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --mode $(MODE) --date $(DATE)
+
 # ============================================================================
 # Complete Pipeline Commands
 # ============================================================================
@@ -156,6 +161,7 @@ help:
 	@echo "  run-single-player-analysis - Analyze single player"
 	@echo "  run-all-players-analysis  - Analyze all players"
 	@echo "  run-club-analysis         - Analyze club data"
+	@echo "  run-process              - Batch process (clean/transform) mode (MODE, DATE required)"
 	@echo ""
 	@echo "🚀 Complete Pipelines:"
 	@echo "  run-player-pipeline       - Complete player pipeline"

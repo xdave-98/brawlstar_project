@@ -114,7 +114,9 @@ class ClubWithMembersRunner(IngestionRunner):
             successful, failed = 0, 0
 
             for i, member_tag in enumerate(member_tags, 1):
-                logger.info(f"\n  👤 Processing member {i}/{len(member_tags)}: {member_tag}")
+                logger.info(
+                    f"\n  👤 Processing member {i}/{len(member_tags)}: {member_tag}"
+                )
                 try:
                     player = Player(member_tag)
 

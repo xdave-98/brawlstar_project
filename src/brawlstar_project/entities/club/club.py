@@ -23,3 +23,15 @@ class Club(TagEntity):
         return self._load_past_days_data(
             base_dir, "club_members.parquet", days, filter_by_tag=False
         )
+
+    @staticmethod
+    def process_club_df(df: pl.DataFrame) -> pl.DataFrame:
+        """Clean and process club DataFrame for silver layer."""
+        # Add club cleaning steps here
+        return df
+
+    @staticmethod
+    def process_club_members_df(df: pl.DataFrame) -> pl.DataFrame:
+        """Clean and process club members DataFrame for silver layer."""
+        # Add club_members cleaning steps here
+        return df
