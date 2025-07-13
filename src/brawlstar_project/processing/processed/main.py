@@ -1,35 +1,42 @@
 import argparse
+import logging
 from pathlib import Path
 
 from brawlstar_project.entities.club import Club
 from brawlstar_project.entities.player import Player
 from brawlstar_project.processing.processed import BattlelogAnalysis, PlayerAnalysis
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 
 def analyze_single_player(args):
     """Analyze a single player."""
-    print(f"\n🚀 Loading player data for {args.player_tag}...")
+    logger.info(f"\n🚀 Loading player data for {args.player_tag}...")
     player = Player(args.player_tag)
     player_df = player.load_player_data(Path(args.data_dir) / "raw", args.days)
-    print(player_df)
+    logger.info(player_df)
 
     # Analyze player data
     if not player_df.is_empty():
-        print("\n" + "=" * 60)
-        print("📊 PLAYER ANALYSIS")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("📊 PLAYER ANALYSIS")
+        logger.info("=" * 60)
         player_analysis = PlayerAnalysis(player_df)
         player_analysis.display_basic_stats()
 
-    print(f"\n⚔️ Loading battlelog data for {args.player_tag}...")
+    logger.info(f"\n⚔️ Loading battlelog data for {args.player_tag}...")
     battlelog_df = player.load_battlelog_data(Path(args.data_dir) / "raw", args.days)
-    print(battlelog_df)
+    logger.info(battlelog_df)
 
     # Analyze battlelog data
     if not battlelog_df.is_empty():
-        print("\n" + "=" * 60)
-        print("⚔️ BATTLELOG ANALYSIS")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("⚔️ BATTLELOG ANALYSIS")
+        logger.info("=" * 60)
         battlelog_analysis = BattlelogAnalysis(battlelog_df)
         battlelog_analysis.display_battlelog_count_per_player()
         battlelog_analysis.display_battle_stats()
@@ -39,14 +46,14 @@ def analyze_all_players(args):
     """Analyze all available players."""
     import polars as pl
 
-    print("\n🚀 Loading all player data...")
+    logger.info("\n🚀 Loading all player data...")
 
     # Load all player data
     raw_dir = Path(args.data_dir) / "raw"
     player_files = list(raw_dir.glob("player/*/player.parquet"))
 
     if not player_files:
-        print("❌ No player data found!")
+        logger.warning("❌ No player data found!")
         return
 
     # Load all player data
@@ -56,25 +63,25 @@ def analyze_all_players(args):
             df = pl.read_parquet(player_file)
             player_dfs.append(df)
         except Exception as e:
-            print(f"⚠️ Error loading {player_file}: {e}")
+            logger.warning(f"⚠️ Error loading {player_file}: {e}")
 
     if not player_dfs:
-        print("❌ No valid player data found!")
+        logger.warning("❌ No valid player data found!")
         return
 
     # Combine all player data
     all_players_df = pl.concat(player_dfs)
-    print(f"📊 Loaded data for {all_players_df['tag'].n_unique()} unique players")
+    logger.info(f"📊 Loaded data for {all_players_df['tag'].n_unique()} unique players")
 
     # Analyze all players
-    print("\n" + "=" * 60)
-    print("📊 ALL PLAYERS ANALYSIS")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("📊 ALL PLAYERS ANALYSIS")
+    logger.info("=" * 60)
     player_analysis = PlayerAnalysis(all_players_df)
     player_analysis.display_basic_stats()
 
     # Load all battlelog data
-    print("\n⚔️ Loading all battlelog data...")
+    logger.info("\n⚔️ Loading all battlelog data...")
     battlelog_files = list(raw_dir.glob("player/*/battlelog.parquet"))
 
     if battlelog_files:
@@ -84,24 +91,24 @@ def analyze_all_players(args):
                 df = pl.read_parquet(battlelog_file)
                 battlelog_dfs.append(df)
             except Exception as e:
-                print(f"⚠️ Error loading {battlelog_file}: {e}")
+                logger.warning(f"⚠️ Error loading {battlelog_file}: {e}")
 
         if battlelog_dfs:
             all_battlelog_df = pl.concat(battlelog_dfs)
-            print(
+            logger.info(
                 f"📊 Loaded battlelog data for {all_battlelog_df['player_tag'].n_unique()} unique players"
             )
 
-            print("\n" + "=" * 60)
-            print("⚔️ ALL PLAYERS BATTLELOG ANALYSIS")
-            print("=" * 60)
+            logger.info("\n" + "=" * 60)
+            logger.info("⚔️ ALL PLAYERS BATTLELOG ANALYSIS")
+            logger.info("=" * 60)
             battlelog_analysis = BattlelogAnalysis(all_battlelog_df)
             battlelog_analysis.display_battlelog_count_per_player()
             battlelog_analysis.display_battle_stats()
         else:
-            print("❌ No valid battlelog data found!")
+            logger.warning("❌ No valid battlelog data found!")
     else:
-        print("❌ No battlelog data found!")
+        logger.warning("❌ No battlelog data found!")
 
 
 def main():
@@ -128,20 +135,20 @@ def main():
         # Analyze specific player
         analyze_single_player(args)
     else:
-        print("❌ Please specify either --player-tag or --all-players")
+        logger.error("❌ Please specify either --player-tag or --all-players")
         return
 
     if args.club_tag:
-        print(f"\n🏛️ Loading club data for {args.club_tag}...")
+        logger.info(f"\n��️ Loading club data for {args.club_tag}...")
         club = Club(args.club_tag)
         club_df = club.load_club_data(Path(args.data_dir) / "raw", args.days)
-        print(club_df)
+        logger.info(club_df)
 
-        print(f"\n👥 Loading club members data for {args.club_tag}...")
+        logger.info(f"\n👥 Loading club members data for {args.club_tag}...")
         club_members_df = club.load_club_members_data(
             Path(args.data_dir) / "raw", args.days
         )
-        print(club_members_df)
+        logger.info(club_members_df)
 
 
 if __name__ == "__main__":
