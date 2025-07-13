@@ -32,10 +32,9 @@ def main():
     print(f"🚀 Starting {args.mode} ingestion pipeline…")
     print(f"📋 Target: {args.tag}")
 
-    # utilise RunnerFactory ici
-    factory = RunnerFactory()
+    factory: RunnerFactory = RunnerFactory()  # type: ignore
     runner = factory.get_runner(args.mode)
-    result = runner.run(client, args.tag, getattr(args, "delay", 1.0))
+    result = runner.run(client, args.tag, getattr(args, "delay", 1.0))  # type: ignore
 
     print("\n📊 Result:")
     print(result)
