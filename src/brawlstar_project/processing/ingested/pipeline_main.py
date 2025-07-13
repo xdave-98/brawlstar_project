@@ -11,6 +11,7 @@ from brawlstar_project.processing.utils.json_utils import (
     save_battlelog_data_partitioned,
     save_player_data_partitioned,
 )
+from brawlstar_project.processing.utils.runner import get_runner
 
 
 def extract_member_tags(club_members_data: dict) -> List[str]:
@@ -117,10 +118,6 @@ def process_club_with_members(
     try:
         club = Club(club_tag)
 
-        # Step 1: Get club data
-        # print("  📋 Fetching club data...")
-        # club_data = fetch_club_data(client, club)
-
         # Step 2: Get club members data
         print("  👥 Fetching club members data...")
         club_members_data = fetch_club_members_data(client, club)
@@ -167,7 +164,7 @@ def process_club_with_members(
 
 
 def main():
-    """Main function to orchestrate different ingestion scenarios."""
+    """Main function to orchestrate ingestion pipeline."""
     parser = argparse.ArgumentParser(
         description="Brawl Stars data ingestion pipeline with different modes."
     )
@@ -177,83 +174,22 @@ def main():
         required=True,
         help="Ingestion mode: player (single), club (single), club-players (club + all members)",
     )
-    parser.add_argument(
-        "--tag",
-        required=True,
-        help="Player tag (for player mode) or Club tag (for club modes)",
-    )
-    parser.add_argument(
-        "--delay",
-        type=float,
-        default=1.0,
-        help="Delay between API calls in seconds (default: 1.0, only for club-players mode)",
-    )
+    parser.add_argument("--tag", required=True, help="Player or Club tag")
+    parser.add_argument("--delay", type=float, default=1.0, help="Delay for club-players mode")
 
     args = parser.parse_args()
 
-    # Load configuration
     config = ConfigLoader.from_env()
     client = BrawlStarsClient(api_key=config.api_key, base_url=config.base_url)
 
-    print(f"🚀 Starting {args.mode} ingestion pipeline...")
+    print(f"🚀 Starting {args.mode} ingestion pipeline…")
     print(f"📋 Target: {args.tag}")
 
-    # ============================================================================
-    # MODE: SINGLE PLAYER
-    # ============================================================================
-    if args.mode == "player":
-        print("\n👤 SINGLE PLAYER MODE")
-        print("=" * 50)
+    runner = get_runner(args.mode)
+    result = runner.run(client, args.tag, getattr(args, "delay", 1.0))
 
-        success = process_single_player(client, args.tag)
-        if success:
-            print(f"\n🎉 Successfully processed player: {args.tag}")
-        else:
-            print(f"\n❌ Failed to process player: {args.tag}")
-
-    # ============================================================================
-    # MODE: SINGLE CLUB
-    # ============================================================================
-    elif args.mode == "club":
-        print("\n🏛️ SINGLE CLUB MODE")
-        print("=" * 50)
-
-        success = process_single_club(client, args.tag)
-        if success:
-            print(f"\n🎉 Successfully processed club: {args.tag}")
-        else:
-            print(f"\n❌ Failed to process club: {args.tag}")
-
-    # ============================================================================
-    # MODE: CLUB WITH ALL MEMBERS
-    # ============================================================================
-    elif args.mode == "club-players":
-        print("\n🏛️ CLUB WITH ALL MEMBERS MODE")
-        print("=" * 50)
-
-        stats = process_club_with_members(client, args.tag, args.delay)
-
-        print("\n📊 Processing Summary:")
-        print(f"  Total members: {stats['total']}")
-        print(f"  Successful: {stats['successful']}")
-        print(f"  Failed: {stats['failed']}")
-
-        if stats["successful"] > 0:
-            print(
-                f"\n🎉 Successfully processed club {args.tag} with {stats['successful']} members"
-            )
-        else:
-            print(f"\n❌ Failed to process club {args.tag}")
-
-    print("\n📁 Data saved in:")
-    if args.mode == "player":
-        print(f"  - Player data: data/ingested/{args.tag}/")
-    elif args.mode == "club":
-        print(f"  - Club data: data/ingested/{args.tag}/")
-    elif args.mode == "club-players":
-        print(f"  - Club data: data/ingested/{args.tag}/")
-        print("  - Player data: data/ingested/[player_tags]/")
-
+    print("\n📊 Result:")
+    print(result)
 
 if __name__ == "__main__":
     main()
