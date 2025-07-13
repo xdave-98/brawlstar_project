@@ -18,19 +18,45 @@ class FactMatchesProcessor:
         self.logger = logging.getLogger(__name__)
 
     def generate_match_id(
-        self, player_tag: str, battle_time: str, map_name: str
+        self, player_tag: str, battle_time, map_name: str
     ) -> str:
         """
-        Generate unique match ID from player_tag, battle_time, and map_name.
+        Generate unique match ID with structure: <player_tag>-<yyyyMMdd>-<map_name>.
+        
+        Args:
+            player_tag: Player tag (e.g., "#GQJRYV0JQ")
+            battle_time: Battle timestamp (datetime or string)
+            map_name: Name of the map
+            
+        Returns:
+            Match ID in format: <player_tag>-<yyyyMMdd>-<map_name>
         """
-        # Clean and combine the components
+        # Clean player tag (remove #)
         clean_player_tag = player_tag.replace("#", "")
+        
+        # Extract date in yyyyMMdd format
+        if hasattr(battle_time, 'strftime'):
+            # battle_time is a datetime object
+            date_str = battle_time.strftime("%Y%m%d")
+        else:
+            # fallback for string - try to parse and extract date
+            try:
+                # Handle ISO format like "20250713T061819.000Z"
+                if "T" in str(battle_time):
+                    date_part = str(battle_time).split("T")[0]
+                    # Convert YYYY-MM-DD to YYYYMMDD
+                    date_str = date_part.replace("-", "")
+                else:
+                    # Try to extract date from other formats
+                    date_str = str(battle_time)[:8]  # Take first 8 chars as date
+            except (ValueError, IndexError, AttributeError):
+                # Fallback to current date if parsing fails
+                date_str = datetime.today().strftime("%Y%m%d")
+        
+        # Clean map name (replace spaces and hyphens with underscores)
         clean_map = map_name.replace(" ", "_").replace("-", "_")
-        clean_battle_time = (
-            battle_time.replace(":", "").replace("-", "").replace(" ", "_")
-        )
-
-        return f"{clean_player_tag}_{clean_battle_time}_{clean_map}"
+        
+        return f"{clean_player_tag}-{date_str}-{clean_map}"
 
     def build_fact_matches(self) -> pl.DataFrame:
         """
@@ -67,8 +93,8 @@ class FactMatchesProcessor:
             how="left",
         )
 
-        # Generate match_id and select fact table columns
-        self.logger.info("Generating match_id and selecting fact table columns...")
+        # Generate match_id and battle_time_date, then select fact table columns
+        self.logger.info("Generating match_id, battle_time_date and selecting fact table columns...")
         fact_matches_df = fact_df.with_columns(
             [
                 pl.struct(["player_tag", "battle_time", "map_name"])
@@ -77,12 +103,14 @@ class FactMatchesProcessor:
                         x["player_tag"], x["battle_time"], x["map_name"]
                     )
                 )
-                .alias("match_id")
+                .alias("match_id"),
+                pl.col("battle_time").dt.date().alias("battle_time_date")
             ]
         ).select(
             [
                 "match_id",
                 "battle_time",
+                "battle_time_date",
                 "player_tag",
                 "club_tag",
                 "map_name",

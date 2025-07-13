@@ -36,6 +36,14 @@ class Player(TagEntity):
         """
         Clean and process battlelog DataFrame for silver layer.
         """
-        return df.filter(
-            ((df["battle_type"] != "friendly") & (df["battle_result"] != "unknown"))
-        ).rename({"event_map": "map_name"})
+        return (
+            df.filter(
+                ((df["battle_type"] != "friendly") & (df["battle_result"] != "unknown"))
+            )
+            .with_columns(
+                pl.col("battle_time").str.strptime(
+                    pl.Datetime, format="%Y%m%dT%H%M%S.%3fZ", strict=False
+                ).alias("battle_time")
+            )
+            .rename({"event_map": "map_name"})
+        )
