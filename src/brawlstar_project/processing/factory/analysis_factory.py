@@ -16,7 +16,6 @@ import polars as pl
 from brawlstar_project.entities.club import Club
 from brawlstar_project.entities.player import Player
 from brawlstar_project.processing.factory.base_factory import BaseFactory, BaseRunner
-from brawlstar_project.processing.processed import BattlelogAnalysis, PlayerAnalysis
 
 logging.basicConfig(
     level=logging.INFO,
@@ -47,34 +46,28 @@ class SinglePlayerAnalysisRunner(AnalysisRunner):
         player = Player(player_tag)
         player_df = player.load_player_data(Path(data_dir) / "raw", days)
 
-        # Analyze player data
         if not player_df.is_empty():
             logger.info("\n" + "=" * 60)
-            logger.info("📊 PLAYER ANALYSIS")
+            logger.info("📊 PLAYER DATAFRAME")
             logger.info("=" * 60)
-            player_analysis = PlayerAnalysis(player_df)
-            player_analysis.display_basic_stats()
-            self.results["player_analysis"] = True
+            logger.info(f"Schema: {player_df.schema}")
+            logger.info(f"First 5 rows:\n{player_df.head(5)}")
 
-        # Load and analyze battlelog data
         logger.info(f"\n⚔️ Loading battlelog data for {player_tag}...")
         battlelog_df = player.load_battlelog_data(Path(data_dir) / "raw", days)
 
         if not battlelog_df.is_empty():
             logger.info("\n" + "=" * 60)
-            logger.info("⚔️ BATTLELOG ANALYSIS")
+            logger.info("⚔️ BATTLELOG DATAFRAME")
             logger.info("=" * 60)
-            battlelog_analysis = BattlelogAnalysis(battlelog_df)
-            battlelog_analysis.display_battlelog_count_per_player()
-            battlelog_analysis.display_battle_stats()
-            self.results["battlelog_analysis"] = True
+            logger.info(f"Schema: {battlelog_df.schema}")
+            logger.info(f"First 5 rows:\n{battlelog_df.head(5)}")
 
         return {
             "status": "success",
             "player_tag": player_tag,
             "has_player_data": not player_df.is_empty(),
             "has_battlelog_data": not battlelog_df.is_empty(),
-            "results": self.results,
         }
 
 
@@ -94,7 +87,6 @@ class AllPlayersAnalysisRunner(AnalysisRunner):
             logger.warning("❌ No player data found!")
             return {"status": "error", "message": "No player data found"}
 
-        # Load all player data
         player_dfs = []
         for player_file in player_files:
             try:
@@ -107,21 +99,15 @@ class AllPlayersAnalysisRunner(AnalysisRunner):
             logger.warning("❌ No valid player data found!")
             return {"status": "error", "message": "No valid player data found"}
 
-        # Combine all player data
         all_players_df = pl.concat(player_dfs)
-        logger.info(
-            f"📊 Loaded data for {all_players_df['tag'].n_unique()} unique players"
-        )
+        logger.info(f"📊 Loaded data for {all_players_df['tag'].n_unique()} unique players")
 
-        # Analyze all players
         logger.info("\n" + "=" * 60)
-        logger.info("📊 ALL PLAYERS ANALYSIS")
+        logger.info("📊 ALL PLAYERS DATAFRAME")
         logger.info("=" * 60)
-        player_analysis = PlayerAnalysis(all_players_df)
-        player_analysis.display_basic_stats()
-        self.results["player_analysis"] = True
+        logger.info(f"Schema: {all_players_df.schema}")
+        logger.info(f"First 5 rows:\n{all_players_df.head(5)}")
 
-        # Load all battlelog data
         logger.info("\n⚔️ Loading all battlelog data...")
         battlelog_files = list(raw_dir.glob("player/*/battlelog.parquet"))
 
@@ -136,17 +122,13 @@ class AllPlayersAnalysisRunner(AnalysisRunner):
 
             if battlelog_dfs:
                 all_battlelog_df = pl.concat(battlelog_dfs)
-                logger.info(
-                    f"📊 Loaded battlelog data for {all_battlelog_df['player_tag'].n_unique()} unique players"
-                )
+                logger.info(f"📊 Loaded battlelog data for {all_battlelog_df['player_tag'].n_unique()} unique players")
 
                 logger.info("\n" + "=" * 60)
-                logger.info("⚔️ ALL PLAYERS BATTLELOG ANALYSIS")
+                logger.info("⚔️ ALL PLAYERS BATTLELOG DATAFRAME")
                 logger.info("=" * 60)
-                battlelog_analysis = BattlelogAnalysis(all_battlelog_df)
-                battlelog_analysis.display_battlelog_count_per_player()
-                battlelog_analysis.display_battle_stats()
-                self.results["battlelog_analysis"] = True
+                logger.info(f"Schema: {all_battlelog_df.schema}")
+                logger.info(f"First 5 rows:\n{all_battlelog_df.head(5)}")
             else:
                 logger.warning("❌ No valid battlelog data found!")
         else:
@@ -155,7 +137,6 @@ class AllPlayersAnalysisRunner(AnalysisRunner):
         return {
             "status": "success",
             "total_players": all_players_df["tag"].n_unique(),
-            "results": self.results,
         }
 
 
@@ -173,8 +154,21 @@ class ClubAnalysisRunner(AnalysisRunner):
         logger.info(f"\n🏛️ Loading club data for {club_tag}...")
         club = Club(club_tag)
         club_df = club.load_club_data(Path(data_dir) / "raw", days)
+        if not club_df.is_empty():
+            logger.info("\n" + "=" * 60)
+            logger.info("🏛️ CLUB DATAFRAME")
+            logger.info("=" * 60)
+            logger.info(f"Schema: {club_df.schema}")
+            logger.info(f"First 5 rows:\n{club_df.head(5)}")
+
         logger.info(f"\n👥 Loading club members data for {club_tag}...")
         club_members_df = club.load_club_members_data(Path(data_dir) / "raw", days)
+        if not club_members_df.is_empty():
+            logger.info("\n" + "=" * 60)
+            logger.info("👥 CLUB MEMBERS DATAFRAME")
+            logger.info("=" * 60)
+            logger.info(f"Schema: {club_members_df.schema}")
+            logger.info(f"First 5 rows:\n{club_members_df.head(5)}")
 
         return {
             "status": "success",

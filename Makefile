@@ -39,15 +39,15 @@ run-raw-conversion:
 # Analysis Commands
 run-single-player-analysis:
 	@echo "🔷 Run single player analysis"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode single-player --tag $(PLAYER_TAG) --data-dir data
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --mode single-player --player-tag $(PLAYER_TAG) --data-dir data
 
 run-all-players-analysis:
 	@echo "🔷 Run analysis on all available players"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode all-players --data-dir data
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --mode all-players --data-dir data
 
 run-club-analysis:
 	@echo "🔷 Run club analysis"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode club --tag $(CLUB_TAG) --data-dir data
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --mode club --club-tag $(CLUB_TAG) --data-dir data
 
 # ============================================================================
 # Complete Pipeline Commands
