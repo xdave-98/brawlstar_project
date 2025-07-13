@@ -29,15 +29,6 @@ class DimGameModesProcessor(BaseDimensionProcessor):
         dim_game_modes_df = (
             source_df.select("battle_mode")
             .unique(subset=["battle_mode"])
-            .with_columns(
-                [
-                    pl.col("battle_mode").alias(
-                        "game_mode_id"
-                    ),  # Use battle_mode as the ID
-                    pl.col("battle_mode").alias("game_mode_name"),  # Keep the name
-                ]
-            )
-            .select(["game_mode_id", "game_mode_name"])
         )
 
         self.logger.info(
