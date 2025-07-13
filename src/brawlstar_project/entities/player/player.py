@@ -37,8 +37,5 @@ class Player(TagEntity):
         Clean and process battlelog DataFrame for silver layer.
         """
         return df.filter(
-            (
-                (df['battle_type'] != 'friendly')
-                & (df["battle_result"] != "unknown")
-            )
+            ((df["battle_type"] != "friendly") & (df["battle_result"] != "unknown"))
         )

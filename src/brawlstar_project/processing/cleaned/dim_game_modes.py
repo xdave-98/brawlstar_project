@@ -1,0 +1,62 @@
+import logging
+from pathlib import Path
+
+import polars as pl
+
+from .base_dimension_processor import BaseDimensionProcessor
+
+logger = logging.getLogger(__name__)
+
+
+class DimGameModesProcessor(BaseDimensionProcessor):
+    """
+    Processor for building dim_game_modes dimension table from processed battlelog data.
+    """
+
+    def get_source_path(self) -> Path:
+        """Get the path to processed battlelog data."""
+        processed_base = Path("data/processed")
+        return processed_base / "player" / self.date / "battlelog.parquet"
+
+    def get_output_path(self) -> Path:
+        """Get the output path for dim_game_modes."""
+        cleaned_base = Path("data/cleaned")
+        return cleaned_base / "dim_game_modes" / self.date / "dim_game_modes.parquet"
+
+    def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
+        """Build dim_game_modes table by extracting unique game modes."""
+        self.logger.info("Building dim_game_modes table...")
+        dim_game_modes_df = (
+            source_df.select("battle_mode")
+            .unique(subset=["battle_mode"])
+            .with_columns(
+                [
+                    pl.col("battle_mode").alias(
+                        "game_mode_id"
+                    ),  # Use battle_mode as the ID
+                    pl.col("battle_mode").alias("game_mode_name"),  # Keep the name
+                ]
+            )
+            .select(["game_mode_id", "game_mode_name"])
+        )
+
+        self.logger.info(
+            f"Built dim_game_modes table with {len(dim_game_modes_df)} rows"
+        )
+        return dim_game_modes_df
+
+    def get_dimension_name(self) -> str:
+        """Get the dimension name."""
+        return "dim_game_modes"
+
+
+# Convenience function for backward compatibility
+def process_dim_game_modes(date=None):
+    """
+    Convenience function to process dim_game_modes using the processor.
+
+    Args:
+        date: Date partition to process (YYYY-MM-DD). Defaults to today.
+    """
+    processor = DimGameModesProcessor(date)
+    processor.process()

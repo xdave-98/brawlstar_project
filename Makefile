@@ -8,11 +8,17 @@ DEFAULT_PLAYER_TAG = "PC0PPLRU"
 # Default club tag (you should put your own club tag here)
 DEFAULT_CLUB_TAG = "80Y22P29J"
 
+# Default date (today)
+DEFAULT_DATE = $(shell date +%Y-%m-%d)
+
 # Use PLAYER_TAG from command line if defined, else use default
 PLAYER_TAG ?= $(DEFAULT_PLAYER_TAG)
 
 # Use CLUB_TAG from command line if defined, else use default
 CLUB_TAG ?= $(DEFAULT_CLUB_TAG)
+
+# Use DATE from command line if defined, else use default
+DATE ?= $(DEFAULT_DATE)
 
 # ============================================================================
 # Data Pipeline Commands
@@ -53,6 +59,11 @@ run-club-analysis:
 run-process:
 	@echo "🔷 Run batch processing (cleaning) for mode: $(MODE) and date: $(DATE)"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --mode $(MODE) --date $(DATE)
+
+# Gold Layer (Cleaned) Command
+run-gold:
+	@echo "🏆 Run gold layer processing for date: $(DATE)"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/cleaned/main.py --date $(DATE)
 
 # ============================================================================
 # Complete Pipeline Commands
@@ -162,6 +173,7 @@ help:
 	@echo "  run-all-players-analysis  - Analyze all players"
 	@echo "  run-club-analysis         - Analyze club data"
 	@echo "  run-process              - Batch process (clean/transform) mode (MODE, DATE required)"
+	@echo "  run-gold                 - Gold layer processing (DATE required)"
 	@echo ""
 	@echo "🚀 Complete Pipelines:"
 	@echo "  run-player-pipeline       - Complete player pipeline"
