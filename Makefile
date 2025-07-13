@@ -15,49 +15,28 @@ PLAYER_TAG ?= $(DEFAULT_PLAYER_TAG)
 CLUB_TAG ?= $(DEFAULT_CLUB_TAG)
 
 # ============================================================================
-# ETL Pipeline Commands
+# Data Pipeline Commands
 # ============================================================================
 
-run-player-ingestion-stage:
+# Ingestion Commands
+run-player-ingestion:
 	@echo "🔷 Ingest player data for tag: $(PLAYER_TAG)"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/pipeline_main.py --mode player --tag $(PLAYER_TAG)
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/main.py --mode player --tag $(PLAYER_TAG)
 
-run-club-ingestion-stage:
+run-club-ingestion:
 	@echo "🔷 Ingest club data for tag: $(CLUB_TAG)"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/pipeline_main.py --mode club --tag $(CLUB_TAG)
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/main.py --mode club --tag $(CLUB_TAG)
 
-run-club-players-ingestion-stage:
+run-club-players-ingestion:
 	@echo "🔷 Ingest club data and ALL its members' data for tag: $(CLUB_TAG)"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/pipeline_main.py --mode club-players --tag $(CLUB_TAG)
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/ingested/main.py --mode club-players --tag $(CLUB_TAG)
 
-run-raw-stage:
+# Conversion Command
+run-raw-conversion:
 	@echo "🔷 Convert JSON files to Parquet"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/raw/main.py
 
-run-player-processed:
-	@echo "🔷 Display processed player data"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --player-tag $(PLAYER_TAG)
-
-run-processed-stage:
-	@echo "🔷 Show all processed data (player and club)"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --player-tag $(PLAYER_TAG) --club-tag $(CLUB_TAG)
-
-# ============================================================================
-# Unified Pipeline Commands
-# ============================================================================
-
-run-unified-ingestion:
-	@echo "🔷 Run unified ingestion pipeline"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage ingestion --mode $(MODE) --tag $(TAG) --delay $(DELAY)
-
-run-unified-analysis:
-	@echo "🔷 Run unified analysis pipeline"
-	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode $(MODE) --tag $(TAG) --data-dir data
-
-# ============================================================================
-# Analysis Commands (using new factory)
-# ============================================================================
-
+# Analysis Commands
 run-single-player-analysis:
 	@echo "🔷 Run single player analysis"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode single-player --tag $(PLAYER_TAG) --data-dir data
@@ -70,43 +49,47 @@ run-club-analysis:
 	@echo "🔷 Run club analysis"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode club --tag $(CLUB_TAG) --data-dir data
 
+# ============================================================================
+# Complete Pipeline Commands
+# ============================================================================
 
-
-# Complete pipeline commands
 run-player-pipeline:
-	@echo "👤 Complete player pipeline: ingestion + raw + processed"
+	@echo "👤 Complete player pipeline: ingestion + conversion + analysis"
 	@echo "📥 Step 1: Ingest player data..."
-	$(MAKE) run-player-ingestion-stage
+	$(MAKE) run-player-ingestion
 	@echo "🔄 Step 2: Convert to Parquet..."
-	$(MAKE) run-raw-stage
-	@echo "📊 Step 3: Show processed data..."
-	$(MAKE) run-processed-stage
+	$(MAKE) run-raw-conversion
+	@echo "📊 Step 3: Analyze data..."
+	$(MAKE) run-single-player-analysis
 
 run-club-pipeline:
-	@echo "🏛️ Complete club pipeline: ingestion + raw + processed"
+	@echo "🏛️ Complete club pipeline: ingestion + conversion + analysis"
 	@echo "📥 Step 1: Ingest club data..."
-	$(MAKE) run-club-ingestion-stage
+	$(MAKE) run-club-ingestion
 	@echo "🔄 Step 2: Convert to Parquet..."
-	$(MAKE) run-raw-stage
-	@echo "📊 Step 3: Show processed data..."
-	$(MAKE) run-processed-stage
+	$(MAKE) run-raw-conversion
+	@echo "📊 Step 3: Analyze data..."
+	$(MAKE) run-club-analysis
 
 run-club-players-pipeline:
-	@echo "🚀 Complete club-players pipeline: ingestion + raw + processed"
+	@echo "🚀 Complete club-players pipeline: ingestion + conversion + analysis"
 	@echo "📥 Step 1: Ingest club and all members' data..."
-	$(MAKE) run-club-players-ingestion-stage
+	$(MAKE) run-club-players-ingestion
 	@echo "🔄 Step 2: Convert to Parquet..."
-	$(MAKE) run-raw-stage
-	@echo "📊 Step 3: Show processed data..."
-	$(MAKE) run-processed-stage
+	$(MAKE) run-raw-conversion
+	@echo "📊 Step 3: Analyze all players..."
+	$(MAKE) run-all-players-analysis
 
 # ============================================================================
-# Tests
+# Development Commands
 # ============================================================================
 
+# Testing
 test:
 	@echo "✅ Running all tests..."
 	PYTHONPATH=src uv run pytest
+
+run-test: test
 
 test-pydantic:
 	@echo "✅ Running Pydantic model tests..."
@@ -116,12 +99,7 @@ test-coverage:
 	@echo "✅ Running tests with coverage..."
 	PYTHONPATH=src uv run pytest --cov=src/brawlstar_project --cov-report=html --cov-report=term
 
-run-test: test
-
-# ============================================================================
-# Linting & Formatting
-# ============================================================================
-
+# Code Quality
 lint:
 	@echo "🔍 Running Ruff checks..."
 	uv run ruff check .
@@ -135,12 +113,8 @@ format:
 	uv run ruff format .
 	uv run isort .
 
-sort-imports:
-	@echo "🔃 Sorting imports..."
-	uv run isort .
-
 # ============================================================================
-# Clean up
+# Cleanup Commands
 # ============================================================================
 
 clean:
@@ -164,15 +138,35 @@ clean-processed:
 	@echo "🗑️  Cleaning processed data..."
 	rm -rf data/processed
 
-clean-player-data:
-	@echo "🗑️  Cleaning player data for tag: $(PLAYER_TAG)"
-	rm -rf data/ingested/$(PLAYER_TAG) data/raw/*/$(PLAYER_TAG)
-
-clean-club-data:
-	@echo "🗑️  Cleaning club data for tag: $(CLUB_TAG)"
-	rm -rf data/ingested/$(CLUB_TAG) data/raw/*/$(CLUB_TAG)
-
 clean-all: clean clean-data
 	@echo "🧹 Complete cleanup done!"
 
-.PHONY: run-player-ingestion run-player-raw run-player-processed test lint fix format clean clean-data clean-ingested clean-raw clean-processed clean-player-data clean-club-data clean-all run-player-pipeline run-club-pipeline
+# ============================================================================
+# Help
+# ============================================================================
+
+help:
+	@echo "📋 Available commands:"
+	@echo ""
+	@echo "🔷 Data Pipeline:"
+	@echo "  run-player-ingestion      - Ingest single player data"
+	@echo "  run-club-ingestion        - Ingest club data"
+	@echo "  run-club-players-ingestion - Ingest club + all members"
+	@echo "  run-raw-conversion        - Convert JSON to Parquet"
+	@echo "  run-single-player-analysis - Analyze single player"
+	@echo "  run-all-players-analysis  - Analyze all players"
+	@echo "  run-club-analysis         - Analyze club data"
+	@echo ""
+	@echo "🚀 Complete Pipelines:"
+	@echo "  run-player-pipeline       - Complete player pipeline"
+	@echo "  run-club-pipeline         - Complete club pipeline"
+	@echo "  run-club-players-pipeline - Complete club-players pipeline"
+	@echo ""
+	@echo "🛠️  Development:"
+	@echo "  test                      - Run all tests"
+	@echo "  lint                      - Run linting"
+	@echo "  format                    - Format code"
+	@echo "  clean                     - Clean cache files"
+	@echo "  clean-data                - Clean all data"
+
+.PHONY: help test lint fix format clean clean-data clean-ingested clean-raw clean-processed clean-all run-player-pipeline run-club-pipeline run-club-players-pipeline
