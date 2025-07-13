@@ -26,10 +26,7 @@ class DimMapsProcessor(BaseDimensionProcessor):
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_maps table by extracting unique maps."""
         self.logger.info("Building dim_maps table...")
-        dim_maps_df = (
-            source_df.select("map_name")
-            .unique(subset=["map_name"])
-        )
+        dim_maps_df = source_df.select("map_name").unique(subset=["map_name"])
 
         self.logger.info(f"Built dim_maps table with {len(dim_maps_df)} rows")
         return dim_maps_df

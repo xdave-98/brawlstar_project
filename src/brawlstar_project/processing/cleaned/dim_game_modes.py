@@ -26,9 +26,8 @@ class DimGameModesProcessor(BaseDimensionProcessor):
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_game_modes table by extracting unique game modes."""
         self.logger.info("Building dim_game_modes table...")
-        dim_game_modes_df = (
-            source_df.select("battle_mode")
-            .unique(subset=["battle_mode"])
+        dim_game_modes_df = source_df.select("battle_mode").unique(
+            subset=["battle_mode"]
         )
 
         self.logger.info(

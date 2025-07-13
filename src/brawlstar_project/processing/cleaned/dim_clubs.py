@@ -26,17 +26,20 @@ class DimClubsProcessor(BaseDimensionProcessor):
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_clubs table from club data."""
         self.logger.info("Building dim_clubs table...")
+
+        OUTPUT_DIM_CLUB_COLS = [
+            "tag",
+            "name",
+            "description",
+            "trophies",
+            "required_trophies",
+            "member_count",
+        ]
+
         dim_clubs_df = (
-            source_df.select(
-                [
-                    "tag",
-                    "name",
-                    "description",
-                    "trophies",
-                    "required_trophies",
-                    "member_count",
-                ]
-            ).unique(subset=["tag"])  # Ensure one row per club
+            source_df.select(OUTPUT_DIM_CLUB_COLS).unique(
+                subset=["tag"]
+            )  # Ensure one row per club
         )
 
         self.logger.info(f"Built dim_clubs table with {len(dim_clubs_df)} rows")
