@@ -29,13 +29,11 @@ class Player(TagEntity):
             "best_robo_rumble_time",
             "best_time_as_big_brawler",
         ]
-        df = df.drop(columns_to_drop)
-        return df
+        return df.drop(columns_to_drop)
 
     @staticmethod
     def process_battlelog_df(df: pl.DataFrame) -> pl.DataFrame:
-        """Clean and process battlelog DataFrame for silver layer."""
-        # Example: Remove friendlies, drop null events, etc.
-        # df = df.filter(df["battle_type"] != "friendly")
-        # Add more battlelog cleaning steps here
-        return df
+        """
+        Clean and process battlelog DataFrame for silver layer.
+        """
+        return df.filter(df['battle_type'] != 'friendly')

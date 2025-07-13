@@ -27,11 +27,13 @@ class Club(TagEntity):
     @staticmethod
     def process_club_df(df: pl.DataFrame) -> pl.DataFrame:
         """Clean and process club DataFrame for silver layer."""
-        # Add club cleaning steps here
-        return df
+        return df.drop("badge_id")
 
     @staticmethod
     def process_club_members_df(df: pl.DataFrame) -> pl.DataFrame:
         """Clean and process club members DataFrame for silver layer."""
-        # Add club_members cleaning steps here
-        return df
+        columns_to_drop = [
+            "name_color",
+            "icon_id",
+        ]
+        return df.drop(columns_to_drop)
