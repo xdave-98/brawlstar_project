@@ -6,12 +6,12 @@ from brawlstar_project.entities.club import Club
 from brawlstar_project.entities.player import Player
 from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
 from brawlstar_project.processing.ingested.config import ConfigLoader
-from brawlstar_project.processing.utils.json_utils import (
+from brawlstar_project.processing.utils import (
     fetch_club_members_data,
+    get_runner,
     save_battlelog_data_partitioned,
     save_player_data_partitioned,
 )
-from brawlstar_project.processing.utils.runner import get_runner
 
 
 def extract_member_tags(club_members_data: dict) -> List[str]:
@@ -175,7 +175,9 @@ def main():
         help="Ingestion mode: player (single), club (single), club-players (club + all members)",
     )
     parser.add_argument("--tag", required=True, help="Player or Club tag")
-    parser.add_argument("--delay", type=float, default=1.0, help="Delay for club-players mode")
+    parser.add_argument(
+        "--delay", type=float, default=1.0, help="Delay for club-players mode"
+    )
 
     args = parser.parse_args()
 
@@ -190,6 +192,7 @@ def main():
 
     print("\n📊 Result:")
     print(result)
+
 
 if __name__ == "__main__":
     main()

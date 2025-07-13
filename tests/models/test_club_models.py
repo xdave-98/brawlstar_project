@@ -1,4 +1,4 @@
-from brawlstar_project.entities.club.models.club import ClubData
+from brawlstar_project.entities.club.models import ClubData
 
 
 class TestClubData:

@@ -2,10 +2,9 @@
 Tests for generic utility functions in Brawl Stars data processing.
 """
 
-
 import polars as pl
 
-from brawlstar_project.processing.utils.json_utils import (
+from brawlstar_project.processing.utils import (
     flatten_battlelog_data,
     flatten_player_data,
 )

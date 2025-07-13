@@ -1,4 +1,4 @@
-from brawlstar_project.processing.utils.json_utils import (
+from brawlstar_project.processing.utils import (
     convert_all_json_to_parquet_partitioned,
 )
 

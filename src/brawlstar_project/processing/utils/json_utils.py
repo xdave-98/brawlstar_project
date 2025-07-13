@@ -55,7 +55,7 @@ def save_player_data_partitioned(data: dict, player_tag: str) -> dict:
     Returns:
         Validated player data dict
     """
-    from brawlstar_project.entities.player.models.player import PlayerData
+    from brawlstar_project.entities.player.models import PlayerData
 
     # Validate data with Pydantic model
     player_data = PlayerData.model_validate(data)
@@ -77,7 +77,7 @@ def save_battlelog_data_partitioned(data: dict, player_tag: str) -> dict:
     Returns:
         Validated battlelog data dict
     """
-    from brawlstar_project.entities.player.models.battlelog import BattlelogData
+    from brawlstar_project.entities.player.models import BattlelogData
 
     # Validate data with Pydantic model
     battlelog_data = BattlelogData.model_validate(data)
@@ -99,7 +99,7 @@ def save_club_data_partitioned(data: dict, club_tag: str) -> dict:
     Returns:
         Validated club data dict
     """
-    from brawlstar_project.entities.club.models.club import ClubData
+    from brawlstar_project.entities.club.models import ClubData
 
     # Validate data with Pydantic model
     club_data = ClubData.model_validate(data)
@@ -121,7 +121,7 @@ def save_club_members_data_partitioned(data: dict, club_tag: str) -> dict:
     Returns:
         Validated club members data dict
     """
-    from brawlstar_project.entities.club.models.members import ClubMembersData
+    from brawlstar_project.entities.club.models import ClubMembersData
 
     # Validate data with Pydantic model
     club_members_data = ClubMembersData.model_validate(data)
@@ -287,7 +287,7 @@ def flatten_player_data(data: dict) -> pl.DataFrame:
     Returns:
         DataFrame with flattened player data
     """
-    from brawlstar_project.entities.player.models.player import (
+    from brawlstar_project.entities.player.models import (
         create_flattened_player_data,
     )
 
@@ -309,7 +309,7 @@ def flatten_battlelog_data(data: dict) -> pl.DataFrame:
     Returns:
         DataFrame with flattened battlelog data
     """
-    from brawlstar_project.entities.player.models.battlelog import (
+    from brawlstar_project.entities.player.models import (
         create_flattened_battle_data,
     )
 
@@ -345,7 +345,7 @@ def flatten_club_data(data: dict) -> pl.DataFrame:
     Returns:
         DataFrame with flattened club data
     """
-    from brawlstar_project.entities.club.models.club import create_flattened_club_data
+    from brawlstar_project.entities.club.models import create_flattened_club_data
 
     try:
         flattened = create_flattened_club_data(data)
@@ -365,7 +365,7 @@ def flatten_club_members_data(data: dict) -> pl.DataFrame:
     Returns:
         DataFrame with flattened club members data
     """
-    from brawlstar_project.entities.club.models.members import (
+    from brawlstar_project.entities.club.models import (
         create_flattened_club_members_data,
     )
 

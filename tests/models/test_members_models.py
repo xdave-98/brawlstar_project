@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from brawlstar_project.entities.club.models.members import ClubMembersData
+from brawlstar_project.entities.club.models import ClubMembersData
 
 
 class TestClubMembersData:
