@@ -13,62 +13,29 @@ class BrawlStarsClient:
         self.base_url = self.base_url.rstrip("/")
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
 
-    def get_player(self, player_tag: str) -> dict:
+    def _get(self, path: str) -> dict:
         """
-        Fetch player information from the Brawl Stars API.
+        Internal helper to perform GET requests.
 
         Args:
-            player_tag: Brawl Stars player tag (without #)
+            path: URL path (starting without /)
 
         Returns:
             Parsed JSON response as a Python dictionary.
         """
-        url = f"{self.base_url}/players/{player_tag}"
+        url = f"{self.base_url}/{path.lstrip('/')}"
         resp = requests.get(url, headers=self.headers)
         resp.raise_for_status()
         return resp.json()
+
+    def get_player(self, player_tag: str) -> dict:
+        return self._get(f"players/{player_tag}")
 
     def get_battlelog(self, player_tag: str) -> dict:
-        """
-        Fetch the battle log for a given player from the Brawl Stars API.
-
-        Args:
-            player_tag: Brawl Stars player tag (without #)
-
-        Returns:
-            Parsed JSON response as a Python dictionary.
-        """
-        url = f"{self.base_url}/players/{player_tag}/battlelog"
-        resp = requests.get(url, headers=self.headers)
-        resp.raise_for_status()
-        return resp.json()
+        return self._get(f"players/{player_tag}/battlelog")
 
     def get_club(self, club_tag: str) -> dict:
-        """
-        Fetch club information from the Brawl Stars API.
-
-        Args:
-            club_tag: Brawl Stars club tag (without #)
-
-        Returns:
-            Parsed JSON response as a Python dictionary.
-        """
-        url = f"{self.base_url}/clubs/{club_tag}"
-        resp = requests.get(url, headers=self.headers)
-        resp.raise_for_status()
-        return resp.json()
+        return self._get(f"clubs/{club_tag}")
 
     def get_club_members(self, club_tag: str) -> dict:
-        """
-        Fetch the list of members of a given club.
-
-        Args:
-            club_tag: Brawl Stars club tag (with or without '#')
-
-        Returns:
-            Parsed JSON response as dict.
-        """
-        url = f"{self.base_url}/clubs/{club_tag}/members"
-        resp = requests.get(url, headers=self.headers)
-        resp.raise_for_status()
-        return resp.json()
+        return self._get(f"clubs/{club_tag}/members")
