@@ -164,44 +164,45 @@ def convert_jsons_to_parquet_per_date_partitioned(
     ingested_path = Path(ingested_base_dir)
     raw_path = Path(raw_base_dir)
 
-    # Find all data_type directories
+    # Find all data_type directories (e.g., player/#TAG)
     data_type_dirs = list(ingested_path.glob(f"{data_type}/*"))
 
+    # Collect all dates across all players
+    all_dates = set()
     for data_type_dir in data_type_dirs:
-        # Find all date directories for this tag
         date_dirs = list(data_type_dir.glob("*"))
-
         for date_dir in date_dirs:
-            date_str = date_dir.name
-            json_file = date_dir / json_filename
+            all_dates.add(date_dir.name)
 
+    for date_str in sorted(all_dates):
+        dfs = []
+        for data_type_dir in data_type_dirs:
+            date_dir = data_type_dir / date_str
+            json_file = date_dir / json_filename
             if not json_file.exists():
                 continue
-
             # Read JSON data
             with open(json_file, "r") as f:
                 data = json.load(f)
-
             # Skip empty battlelog data (no items or empty items)
             if json_filename == "battlelog.json" and (not data.get("items") or len(data.get("items", [])) == 0):
                 print(f"Skipping empty battlelog: {json_file}")
                 continue
-
             # Flatten data to DataFrame
             df = flatten_func(data)
-
-            if df.is_empty():
-                continue
-
-            # Create output directory structure (without tag level)
-            output_dir = raw_path / data_type / date_str
-            output_dir.mkdir(parents=True, exist_ok=True)
-
-            # Save as Parquet
-            parquet_file = output_dir / parquet_filename
-            df.write_parquet(str(parquet_file))
-
-            print(f"Converted: {json_file} -> {parquet_file}")
+            if not df.is_empty():
+                dfs.append(df)
+        if not dfs:
+            continue
+        # Union all player/battlelog data for this date
+        full_df = pl.concat(dfs)
+        # Create output directory structure (without tag level)
+        output_dir = raw_path / data_type / date_str
+        output_dir.mkdir(parents=True, exist_ok=True)
+        # Save as Parquet
+        parquet_file = output_dir / parquet_filename
+        full_df.write_parquet(str(parquet_file))
+        print(f"Converted: {len(dfs)} files -> {parquet_file}")
 
 
 def convert_all_json_to_parquet_partitioned(

@@ -1,8 +1,9 @@
 import time
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from brawlstar_project.entities.club import Club
 from brawlstar_project.entities.player import Player
+from brawlstar_project.processing.factory.base_factory import BaseFactory, BaseRunner
 from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
 from brawlstar_project.processing.utils import (
     fetch_club_data,
@@ -12,7 +13,7 @@ from brawlstar_project.processing.utils import (
 )
 
 
-class IngestionRunner(ABC):
+class IngestionRunner(BaseRunner):
     """
     Abstract base class for ingestion runners.
     """
@@ -139,33 +140,14 @@ class ClubWithMembersRunner(IngestionRunner):
             return {"status": "error", "error": str(e)}
 
 
-class RunnerFactory:
+class RunnerFactory(BaseFactory):
     """
     Factory to obtain the appropriate IngestionRunner based on mode.
     """
 
-    _registry = {
-        "player": PlayerRunner,
-        "club": ClubRunner,
-        "club-players": ClubWithMembersRunner,
-    }
-
-    @classmethod
-    def get_runner(cls, mode: str) -> IngestionRunner:
-        """
-        Return the appropriate IngestionRunner for the given mode.
-
-        Args:
-            mode: Mode string ("player", "club", "club-players")
-
-        Returns:
-            IngestionRunner instance
-
-        Raises:
-            ValueError: if mode is unknown
-        """
-        try:
-            runner_cls = cls._registry[mode]
-            return runner_cls()
-        except KeyError:
-            raise ValueError(f"Unknown mode: {mode}")
+    def __init__(self):
+        super().__init__()
+        # Register default ingestion modes
+        self.register("player", PlayerRunner)
+        self.register("club", ClubRunner)
+        self.register("club-players", ClubWithMembersRunner)

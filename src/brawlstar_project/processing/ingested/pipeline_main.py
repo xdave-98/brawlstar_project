@@ -33,7 +33,8 @@ def main():
     print(f"📋 Target: {args.tag}")
 
     # utilise RunnerFactory ici
-    runner = RunnerFactory.get_runner(args.mode)
+    factory = RunnerFactory()
+    runner = factory.get_runner(args.mode)
     result = runner.run(client, args.tag, getattr(args, "delay", 1.0))
 
     print("\n📊 Result:")

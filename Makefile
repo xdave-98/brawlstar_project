@@ -42,6 +42,34 @@ run-processed-stage:
 	@echo "🔷 Show all processed data (player and club)"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/processed/main.py --player-tag $(PLAYER_TAG) --club-tag $(CLUB_TAG)
 
+# ============================================================================
+# Unified Pipeline Commands
+# ============================================================================
+
+run-unified-ingestion:
+	@echo "🔷 Run unified ingestion pipeline"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage ingestion --mode $(MODE) --tag $(TAG) --delay $(DELAY)
+
+run-unified-analysis:
+	@echo "🔷 Run unified analysis pipeline"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode $(MODE) --tag $(TAG) --data-dir data
+
+# ============================================================================
+# Analysis Commands (using new factory)
+# ============================================================================
+
+run-single-player-analysis:
+	@echo "🔷 Run single player analysis"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode single-player --tag $(PLAYER_TAG) --data-dir data
+
+run-all-players-analysis:
+	@echo "🔷 Run analysis on all available players"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode all-players --data-dir data
+
+run-club-analysis:
+	@echo "🔷 Run club analysis"
+	PYTHONPATH=src uv run python src/brawlstar_project/processing/unified_main.py --stage analysis --mode club --tag $(CLUB_TAG) --data-dir data
+
 
 
 # Complete pipeline commands

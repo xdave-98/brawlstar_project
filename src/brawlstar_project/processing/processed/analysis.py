@@ -25,9 +25,9 @@ class PlayerAnalysis:
         print(f"   Min trophies: {self.player_df['trophies'].min()}")
 
         print("\n⚔️ BATTLE STATISTICS:")
-        print(f"   3v3 Victories: {self.player_df['3vs3Victories'].sum()}")
-        print(f"   Solo Victories: {self.player_df['soloVictories'].sum()}")
-        print(f"   Duo Victories: {self.player_df['duoVictories'].sum()}")
+        print(f"   3v3 Victories: {self.player_df['three_vs_three_victories'].sum()}")
+        print(f"   Solo Victories: {self.player_df['solo_victories'].sum()}")
+        print(f"   Duo Victories: {self.player_df['duo_victories'].sum()}")
 
         print("\n👥 BRAWLER STATISTICS:")
         print(f"   Total brawlers: {self.player_df['total_brawlers'].sum()}")
@@ -95,3 +95,39 @@ class BattlelogAnalysis:
         if total_battles == 0:
             print("❌ No battles found in the data!")
             return
+
+    def display_battlelog_count_per_player(self) -> None:
+        """Display the number of battlelogs per player."""
+        print("=" * 60)
+        print("📊 BATTLELOG COUNT PER PLAYER")
+        print("=" * 60)
+
+        if self.battlelog_df.is_empty():
+            print("❌ No battlelog data found!")
+            return
+
+        # Count battles per player
+        battles_per_player = self.battlelog_df.group_by("player_tag").agg(
+            pl.count().alias("battle_count")
+        ).sort("battle_count", descending=True)
+
+        print(f"📈 Total players with battlelog data: {len(battles_per_player)}")
+        
+        if len(battles_per_player) == 0:
+            print("❌ No battlelog data found!")
+            return
+
+        print("\n🏆 TOP PLAYERS BY BATTLE COUNT:")
+        for i, row in enumerate(battles_per_player.head(10).iter_rows(named=True), 1):
+            print(f"   {i:2d}. {row['player_tag']}: {row['battle_count']} battles")
+
+        print("\n📊 STATISTICS:")
+        print(f"   Average battles per player: {battles_per_player['battle_count'].mean():.1f}")
+        print(f"   Max battles per player: {battles_per_player['battle_count'].max()}")
+        print(f"   Min battles per player: {battles_per_player['battle_count'].min()}")
+        
+        # Show distribution
+        print("\n📈 DISTRIBUTION:")
+        print(f"   Players with 1-5 battles: {len(battles_per_player.filter(pl.col('battle_count').is_between(1, 5)))}")
+        print(f"   Players with 6-10 battles: {len(battles_per_player.filter(pl.col('battle_count').is_between(6, 10)))}")
+        print(f"   Players with 11+ battles: {len(battles_per_player.filter(pl.col('battle_count') >= 11))}")
