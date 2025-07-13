@@ -6,7 +6,7 @@ from brawlstar_project.entities.club import Club
 from brawlstar_project.entities.player import Player
 from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
 from brawlstar_project.processing.ingested.config import ConfigLoader
-from brawlstar_project.processing.utils import (
+from brawlstar_project.processing.utils.json_utils import (
     fetch_club_members_data,
     save_battlelog_data_partitioned,
     save_player_data_partitioned,
