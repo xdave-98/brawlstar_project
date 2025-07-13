@@ -8,8 +8,8 @@ from brawlstar_project.entities.tag_entity import TagEntity
 
 class Player(TagEntity):
     def validate_tag(self, tag_body: str) -> None:
-        if len(tag_body) < 8 or len(tag_body) > 9:
-            raise ValueError("Player tag must be between 8-9 characters after '#'")
+        if len(tag_body) < 7 or len(tag_body) > 9:
+            raise ValueError("Player tag must be between 7-9 characters after '#'")
         if not re.fullmatch(r"[A-Z0-9]+", tag_body):
             raise ValueError(
                 "Player tag must contain only uppercase letters A-Z and digits 0-9"
