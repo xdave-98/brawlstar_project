@@ -1,10 +1,18 @@
 import json
+import logging
 import os
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
 
 import polars as pl
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 def save_json_data_partitioned(
@@ -39,7 +47,7 @@ def save_json_data_partitioned(
     with open(file_path, "w") as f:
         json.dump(data, f, indent=2)
 
-    print(f"Data saved in: {file_path}")
+    logger.info(f"Data saved in: {file_path}")
     return file_path
 
 
@@ -81,7 +89,7 @@ def save_battlelog_data_partitioned(data: dict, player_tag: str) -> dict:
 
     # Check if data is empty or has no items
     if not data or not data.get("items"):
-        print(f"    ⚠️ No battlelog data available for {player_tag}")
+        logger.warning(f"    ⚠️ No battlelog data available for {player_tag}")
         return {"items": []}
 
     try:
@@ -95,7 +103,7 @@ def save_battlelog_data_partitioned(data: dict, player_tag: str) -> dict:
         )
         return validated_data
     except Exception as e:
-        print(f"    ⚠️ Invalid battlelog data for {player_tag}: {e}")
+        logger.warning(f"    ⚠️ Invalid battlelog data for {player_tag}: {e}")
         # Return empty battlelog data instead of failing
         return {"items": []}
 
@@ -150,7 +158,7 @@ def convert_jsons_to_parquet_per_date_partitioned(
     data_type: str,  # "player" or "club"
     json_filename: str,
     parquet_filename: str,
-    flatten_func: Callable[[dict], pl.DataFrame],
+    flatten_func: Callable[..., pl.DataFrame],
 ):
     """
     Convert JSON files to Parquet files for partitioned structure.
@@ -190,10 +198,14 @@ def convert_jsons_to_parquet_per_date_partitioned(
             if json_filename == "battlelog.json" and (
                 not data.get("items") or len(data.get("items", [])) == 0
             ):
-                print(f"Skipping empty battlelog: {json_file}")
+                logger.info(f"Skipping empty battlelog: {json_file}")
                 continue
             # Flatten data to DataFrame
-            df = flatten_func(data)
+            if json_filename == "battlelog.json":
+                player_tag = data_type_dir.name
+                df = flatten_func(data, player_tag)
+            else:
+                df = flatten_func(data)
             if not df.is_empty():
                 dfs.append(df)
         if not dfs:
@@ -206,7 +218,7 @@ def convert_jsons_to_parquet_per_date_partitioned(
         # Save as Parquet
         parquet_file = output_dir / parquet_filename
         full_df.write_parquet(str(parquet_file))
-        print(f"Converted: {len(dfs)} files -> {parquet_file}")
+        logger.info(f"Converted: {len(dfs)} files -> {parquet_file}")
 
 
 def convert_all_json_to_parquet_partitioned(
@@ -236,7 +248,7 @@ def convert_all_json_to_parquet_partitioned(
         data_type="player",
         json_filename="battlelog.json",
         parquet_filename="battlelog.parquet",
-        flatten_func=flatten_battlelog_data,
+        flatten_func=lambda data, tag: flatten_battlelog_data(data, tag or ""),
     )
 
     # Convert club data
@@ -271,7 +283,7 @@ def fetch_club_data(client, club) -> dict:
     Returns:
         Club data dictionary
     """
-    print("📋 Fetching club data...")
+    logger.info("📋 Fetching club data...")
     club_data = client.get_club(club.formatted_tag)
     save_club_data_partitioned(club_data, club.tag)
     return club_data
@@ -288,7 +300,7 @@ def fetch_club_members_data(client, club) -> dict:
     Returns:
         Club members data dictionary
     """
-    print("👥 Fetching club members data...")
+    logger.info("👥 Fetching club members data...")
     club_members = client.get_club_members(club.formatted_tag)
     save_club_members_data_partitioned(club_members, club.tag)
     return club_members
@@ -311,18 +323,22 @@ def flatten_player_data(data: dict) -> pl.DataFrame:
 
     try:
         flattened = create_flattened_player_data(data)
+        tag = getattr(flattened, 'tag', None)
+        if not tag or tag == "#UNKNOWN" or tag == "UNKNOWN":
+            logger.warning(f"Player data missing or unknown tag: {tag}")
         return pl.DataFrame([flattened.model_dump()])
     except Exception as e:
-        print(f"Error flattening player data: {e}")
+        logger.error(f"Error flattening player data: {e}")
         return pl.DataFrame()
 
 
-def flatten_battlelog_data(data: dict) -> pl.DataFrame:
+def flatten_battlelog_data(data: dict, player_tag: str = "") -> pl.DataFrame:
     """
     Flatten battlelog data to DataFrame.
 
     Args:
         data: Raw battlelog data from JSON
+        player_tag: The tag of the player whose battlelog this is
 
     Returns:
         DataFrame with flattened battlelog data
@@ -332,25 +348,15 @@ def flatten_battlelog_data(data: dict) -> pl.DataFrame:
     )
 
     try:
-        # Extract player tag from the first battle or use a default
-        player_tag = "#UNKNOWN"
-        if data.get("items") and len(data["items"]) > 0:
-            # Try to find player tag in the first battle
-            first_battle = data["items"][0]
-            if "battle" in first_battle and "teams" in first_battle["battle"]:
-                teams = first_battle["battle"]["teams"] or []
-                for team in teams:
-                    if team and len(team) > 0:
-                        player_tag = team[0].get("tag", "#UNKNOWN")
-                        break
-
+        if not player_tag or player_tag == "#UNKNOWN" or player_tag == "UNKNOWN":
+            logger.warning(f"Battlelog data missing or unknown player tag: {player_tag}")
         flattened_battles = create_flattened_battle_data(data, player_tag)
         if flattened_battles:
             return pl.DataFrame([battle.model_dump() for battle in flattened_battles])
         else:
             return pl.DataFrame()
     except Exception as e:
-        print(f"Error flattening battlelog data: {e}")
+        logger.error(f"Error flattening battlelog data: {e}")
         return pl.DataFrame()
 
 
@@ -370,7 +376,7 @@ def flatten_club_data(data: dict) -> pl.DataFrame:
         flattened = create_flattened_club_data(data)
         return pl.DataFrame([flattened.model_dump()])
     except Exception as e:
-        print(f"Error flattening club data: {e}")
+        logger.error(f"Error flattening club data: {e}")
         return pl.DataFrame()
 
 
@@ -395,5 +401,5 @@ def flatten_club_members_data(data: dict) -> pl.DataFrame:
         else:
             return pl.DataFrame()
     except Exception as e:
-        print(f"Error flattening club members data: {e}")
+        logger.error(f"Error flattening club members data: {e}")
         return pl.DataFrame()
