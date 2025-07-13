@@ -65,6 +65,11 @@ run-gold:
 	@echo "🏆 Run gold layer processing for date: $(DATE)"
 	PYTHONPATH=src uv run python src/brawlstar_project/processing/cleaned/main.py --date $(DATE)
 
+# Analytics Commands
+run-duckdb-queries:
+	@echo "📊 Running DuckDB analytics queries..."
+	PYTHONPATH=src uv run python src/brawlstar_project/analytics/duckdb_queries.py
+
 # ============================================================================
 # Complete Pipeline Commands
 # ============================================================================
@@ -174,6 +179,7 @@ help:
 	@echo "  run-club-analysis         - Analyze club data"
 	@echo "  run-process              - Batch process (clean/transform) mode (MODE, DATE required)"
 	@echo "  run-gold                 - Gold layer processing (DATE required)"
+	@echo "  run-duckdb-queries       - Run DuckDB analytics queries"
 	@echo ""
 	@echo "🚀 Complete Pipelines:"
 	@echo "  run-player-pipeline       - Complete player pipeline"
