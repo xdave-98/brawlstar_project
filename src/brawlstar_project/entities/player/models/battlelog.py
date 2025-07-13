@@ -42,7 +42,7 @@ class BattleEvent(BaseModel):
     """Model for battle event information."""
 
     id: int = Field(description="Event ID")
-    mode: str = Field(description="Event mode")
+    mode: Optional[str] = Field(default=None, description="Event mode")
     map: Optional[str] = Field(default=None, description="Event map")
 
 
@@ -151,8 +151,9 @@ def create_flattened_battle_data(
         opponent_count = 0
         player_battle_info = None
 
-        if battle.battle.teams:
-            for team in battle.battle.teams:
+        teams = battle.battle.teams or []
+        if teams:
+            for team in teams:
                 team_size = len(team)
                 for player in team:
                     if player.tag == player_tag:
@@ -160,7 +161,7 @@ def create_flattened_battle_data(
                         break
                 if player_battle_info:
                     break
-            opponent_count = sum(len(team) for team in battle.battle.teams) - team_size
+            opponent_count = sum(len(team) for team in teams) - team_size
 
         # Check if player was star player
         if battle.battle.starPlayer and battle.battle.starPlayer.tag == player_tag:
@@ -179,7 +180,7 @@ def create_flattened_battle_data(
         # Create flattened battle data
         flattened_dict = {
             "battleTime": battle.battleTime,
-            "eventMode": battle.event.mode,
+            "eventMode": battle.event.mode or "unknown",
             "eventMap": battle.event.map or "unknown",
             "battleMode": battle.battle.mode,
             "battleType": battle.battle.type,
