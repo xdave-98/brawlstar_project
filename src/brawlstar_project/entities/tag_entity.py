@@ -47,7 +47,7 @@ class TagEntity(ABC):
             data_type = "club"
         else:
             raise ValueError(f"Unknown filename: {filename}")
-        
+
         return base_dir / data_type / date_str / filename
 
     @staticmethod

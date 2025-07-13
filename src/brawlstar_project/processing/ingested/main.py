@@ -1,8 +1,16 @@
 import argparse
+import logging
 
 from brawlstar_project.processing.ingested.api_client import BrawlStarsClient
 from brawlstar_project.processing.ingested.config import ConfigLoader
 from brawlstar_project.processing.ingested.factory import RunnerFactory
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -29,15 +37,15 @@ def main():
     config = ConfigLoader.from_env()
     client = BrawlStarsClient(api_key=config.api_key, base_url=config.base_url)
 
-    print(f"🚀 Starting {args.mode} ingestion pipeline…")
-    print(f"📋 Target: {args.tag}")
+    logger.info(f"🚀 Starting {args.mode} ingestion pipeline…")
+    logger.info(f"📋 Target: {args.tag}")
 
     factory: RunnerFactory = RunnerFactory()  # type: ignore
     runner = factory.get_runner(args.mode)
     result = runner.run(client, args.tag, getattr(args, "delay", 1.0))  # type: ignore
 
-    print("\n📊 Result:")
-    print(result)
+    logger.info("\n📊 Result:")
+    logger.info(result)
 
 
 if __name__ == "__main__":

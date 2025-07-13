@@ -12,6 +12,7 @@ from typing import Dict, Type
 
 class PipelineStage(Enum):
     """Enumeration of pipeline stages."""
+
     INGESTION = "ingestion"
     ANALYSIS = "analysis"
     PROCESSING = "processing"
@@ -62,4 +63,4 @@ class BaseFactory:
 
     def list_modes(self) -> list:
         """List all available modes."""
-        return list(self._registry.keys()) 
+        return list(self._registry.keys())

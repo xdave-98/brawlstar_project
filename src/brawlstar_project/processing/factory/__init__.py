@@ -10,8 +10,8 @@ from .base_factory import BaseFactory, BaseRunner, PipelineStage
 
 __all__ = [
     "BaseRunner",
-    "BaseFactory", 
+    "BaseFactory",
     "PipelineStage",
     "AnalysisFactory",
-    "AnalysisRunner"
-] 
+    "AnalysisRunner",
+]

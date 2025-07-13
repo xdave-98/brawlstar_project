@@ -90,7 +90,9 @@ def save_battlelog_data_partitioned(data: dict, player_tag: str) -> dict:
         validated_data = battlelog_data.model_dump()
 
         # Save to partitioned structure
-        save_json_data_partitioned(validated_data, player_tag, "player", "battlelog.json")
+        save_json_data_partitioned(
+            validated_data, player_tag, "player", "battlelog.json"
+        )
         return validated_data
     except Exception as e:
         print(f"    ⚠️ Invalid battlelog data for {player_tag}: {e}")
@@ -185,7 +187,9 @@ def convert_jsons_to_parquet_per_date_partitioned(
             with open(json_file, "r") as f:
                 data = json.load(f)
             # Skip empty battlelog data (no items or empty items)
-            if json_filename == "battlelog.json" and (not data.get("items") or len(data.get("items", [])) == 0):
+            if json_filename == "battlelog.json" and (
+                not data.get("items") or len(data.get("items", [])) == 0
+            ):
                 print(f"Skipping empty battlelog: {json_file}")
                 continue
             # Flatten data to DataFrame

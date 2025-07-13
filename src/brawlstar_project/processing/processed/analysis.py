@@ -107,12 +107,14 @@ class BattlelogAnalysis:
             return
 
         # Count battles per player
-        battles_per_player = self.battlelog_df.group_by("player_tag").agg(
-            pl.count().alias("battle_count")
-        ).sort("battle_count", descending=True)
+        battles_per_player = (
+            self.battlelog_df.group_by("player_tag")
+            .agg(pl.count().alias("battle_count"))
+            .sort("battle_count", descending=True)
+        )
 
         print(f"📈 Total players with battlelog data: {len(battles_per_player)}")
-        
+
         if len(battles_per_player) == 0:
             print("❌ No battlelog data found!")
             return
@@ -122,12 +124,20 @@ class BattlelogAnalysis:
             print(f"   {i:2d}. {row['player_tag']}: {row['battle_count']} battles")
 
         print("\n📊 STATISTICS:")
-        print(f"   Average battles per player: {battles_per_player['battle_count'].mean():.1f}")
+        print(
+            f"   Average battles per player: {battles_per_player['battle_count'].mean():.1f}"
+        )
         print(f"   Max battles per player: {battles_per_player['battle_count'].max()}")
         print(f"   Min battles per player: {battles_per_player['battle_count'].min()}")
-        
+
         # Show distribution
         print("\n📈 DISTRIBUTION:")
-        print(f"   Players with 1-5 battles: {len(battles_per_player.filter(pl.col('battle_count').is_between(1, 5)))}")
-        print(f"   Players with 6-10 battles: {len(battles_per_player.filter(pl.col('battle_count').is_between(6, 10)))}")
-        print(f"   Players with 11+ battles: {len(battles_per_player.filter(pl.col('battle_count') >= 11))}")
+        print(
+            f"   Players with 1-5 battles: {len(battles_per_player.filter(pl.col('battle_count').is_between(1, 5)))}"
+        )
+        print(
+            f"   Players with 6-10 battles: {len(battles_per_player.filter(pl.col('battle_count').is_between(6, 10)))}"
+        )
+        print(
+            f"   Players with 11+ battles: {len(battles_per_player.filter(pl.col('battle_count') >= 11))}"
+        )

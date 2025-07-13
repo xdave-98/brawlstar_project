@@ -15,9 +15,9 @@ def analyze_single_player(args):
 
     # Analyze player data
     if not player_df.is_empty():
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("📊 PLAYER ANALYSIS")
-        print("="*60)
+        print("=" * 60)
         player_analysis = PlayerAnalysis(player_df)
         player_analysis.display_basic_stats()
 
@@ -27,9 +27,9 @@ def analyze_single_player(args):
 
     # Analyze battlelog data
     if not battlelog_df.is_empty():
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("⚔️ BATTLELOG ANALYSIS")
-        print("="*60)
+        print("=" * 60)
         battlelog_analysis = BattlelogAnalysis(battlelog_df)
         battlelog_analysis.display_battlelog_count_per_player()
         battlelog_analysis.display_battle_stats()
@@ -38,17 +38,17 @@ def analyze_single_player(args):
 def analyze_all_players(args):
     """Analyze all available players."""
     import polars as pl
-    
+
     print("\n🚀 Loading all player data...")
-    
+
     # Load all player data
     raw_dir = Path(args.data_dir) / "raw"
     player_files = list(raw_dir.glob("player/*/player.parquet"))
-    
+
     if not player_files:
         print("❌ No player data found!")
         return
-    
+
     # Load all player data
     player_dfs = []
     for player_file in player_files:
@@ -57,26 +57,26 @@ def analyze_all_players(args):
             player_dfs.append(df)
         except Exception as e:
             print(f"⚠️ Error loading {player_file}: {e}")
-    
+
     if not player_dfs:
         print("❌ No valid player data found!")
         return
-    
+
     # Combine all player data
     all_players_df = pl.concat(player_dfs)
     print(f"📊 Loaded data for {all_players_df['tag'].n_unique()} unique players")
-    
+
     # Analyze all players
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 ALL PLAYERS ANALYSIS")
-    print("="*60)
+    print("=" * 60)
     player_analysis = PlayerAnalysis(all_players_df)
     player_analysis.display_basic_stats()
-    
+
     # Load all battlelog data
     print("\n⚔️ Loading all battlelog data...")
     battlelog_files = list(raw_dir.glob("player/*/battlelog.parquet"))
-    
+
     if battlelog_files:
         battlelog_dfs = []
         for battlelog_file in battlelog_files:
@@ -85,14 +85,16 @@ def analyze_all_players(args):
                 battlelog_dfs.append(df)
             except Exception as e:
                 print(f"⚠️ Error loading {battlelog_file}: {e}")
-        
+
         if battlelog_dfs:
             all_battlelog_df = pl.concat(battlelog_dfs)
-            print(f"📊 Loaded battlelog data for {all_battlelog_df['player_tag'].n_unique()} unique players")
-            
-            print("\n" + "="*60)
+            print(
+                f"📊 Loaded battlelog data for {all_battlelog_df['player_tag'].n_unique()} unique players"
+            )
+
+            print("\n" + "=" * 60)
             print("⚔️ ALL PLAYERS BATTLELOG ANALYSIS")
-            print("="*60)
+            print("=" * 60)
             battlelog_analysis = BattlelogAnalysis(all_battlelog_df)
             battlelog_analysis.display_battlelog_count_per_player()
             battlelog_analysis.display_battle_stats()
@@ -108,7 +110,9 @@ def main():
         description="Display Brawl Stars data from Parquet files"
     )
     parser.add_argument("--player-tag", help="Player tag to analyze")
-    parser.add_argument("--all-players", action="store_true", help="Analyze all available players")
+    parser.add_argument(
+        "--all-players", action="store_true", help="Analyze all available players"
+    )
     parser.add_argument("--club-tag", help="Club tag to analyze")
     parser.add_argument(
         "--data-dir", default="data", help="Directory containing data files"
@@ -138,6 +142,7 @@ def main():
             Path(args.data_dir) / "raw", args.days
         )
         print(club_members_df)
+
 
 if __name__ == "__main__":
     main()
