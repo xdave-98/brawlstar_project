@@ -18,14 +18,14 @@ class FactMatchesProcessor:
         self.logger = logging.getLogger(__name__)
 
     def generate_match_id(
-        self, player_tag: str, battle_time: str, event_map: str
+        self, player_tag: str, battle_time: str, map_name: str
     ) -> str:
         """
-        Generate unique match ID from player_tag, battle_time, and event_map.
+        Generate unique match ID from player_tag, battle_time, and map_name.
         """
         # Clean and combine the components
         clean_player_tag = player_tag.replace("#", "")
-        clean_map = event_map.replace(" ", "_").replace("-", "_")
+        clean_map = map_name.replace(" ", "_").replace("-", "_")
         clean_battle_time = (
             battle_time.replace(":", "").replace("-", "").replace(" ", "_")
         )
@@ -71,10 +71,10 @@ class FactMatchesProcessor:
         self.logger.info("Generating match_id and selecting fact table columns...")
         fact_matches_df = fact_df.with_columns(
             [
-                pl.struct(["player_tag", "battle_time", "event_map"])
+                pl.struct(["player_tag", "battle_time", "map_name"])
                 .map_elements(
                     lambda x: self.generate_match_id(
-                        x["player_tag"], x["battle_time"], x["event_map"]
+                        x["player_tag"], x["battle_time"], x["map_name"]
                     )
                 )
                 .alias("match_id")
@@ -85,7 +85,7 @@ class FactMatchesProcessor:
                 "battle_time",
                 "player_tag",
                 "club_tag",
-                "event_map",
+                "map_name",
                 "battle_mode",
                 "battle_result",
             ]

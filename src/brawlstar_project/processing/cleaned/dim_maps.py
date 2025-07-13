@@ -27,17 +27,8 @@ class DimMapsProcessor(BaseDimensionProcessor):
         """Build dim_maps table by extracting unique maps."""
         self.logger.info("Building dim_maps table...")
         dim_maps_df = (
-            source_df.select("event_map")
-            .unique(subset=["event_map"])
-            .with_columns(
-                [
-                    pl.col("event_map").alias("map_id"),  # Use event_map as the ID
-                    pl.col("event_map").alias(
-                        "map_name_display"
-                    ),  # Keep the display name
-                ]
-            )
-            .select(["map_id", "map_name_display"])
+            source_df.select("map_name")
+            .unique(subset=["map_name"])
         )
 
         self.logger.info(f"Built dim_maps table with {len(dim_maps_df)} rows")
