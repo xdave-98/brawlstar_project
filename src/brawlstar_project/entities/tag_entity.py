@@ -40,7 +40,15 @@ class TagEntity(ABC):
 
     @staticmethod
     def _build_parquet_path(base_dir: Path, filename: str, date_str: str) -> Path:
-        return base_dir / date_str / filename
+        # Determine data type from filename
+        if filename in ["player.parquet", "battlelog.parquet"]:
+            data_type = "player"
+        elif filename in ["club.parquet", "club_members.parquet"]:
+            data_type = "club"
+        else:
+            raise ValueError(f"Unknown filename: {filename}")
+        
+        return base_dir / data_type / date_str / filename
 
     @staticmethod
     def _read_parquet(path: Path) -> pl.DataFrame:

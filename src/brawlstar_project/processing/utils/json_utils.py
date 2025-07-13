@@ -158,8 +158,6 @@ def convert_jsons_to_parquet_per_date_partitioned(
     data_type_dirs = list(ingested_path.glob(f"{data_type}/*"))
 
     for data_type_dir in data_type_dirs:
-        tag = data_type_dir.name
-
         # Find all date directories for this tag
         date_dirs = list(data_type_dir.glob("*"))
 
@@ -180,8 +178,8 @@ def convert_jsons_to_parquet_per_date_partitioned(
             if df.is_empty():
                 continue
 
-            # Create output directory structure
-            output_dir = raw_path / data_type / tag / date_str
+            # Create output directory structure (without tag level)
+            output_dir = raw_path / data_type / date_str
             output_dir.mkdir(parents=True, exist_ok=True)
 
             # Save as Parquet

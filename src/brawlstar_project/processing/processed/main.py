@@ -40,6 +40,5 @@ def main():
         )
         print(club_members_df)
 
-
 if __name__ == "__main__":
     main()
