@@ -1,3 +1,10 @@
+"""
+This script processes the gold layer (cleaned stage) for a given date.
+- Use --date to select the date partition (default: today).
+- Intended for batch, Airflow, or ad-hoc runs.
+- For full pipeline, use unified_main.py.
+"""
+
 import argparse
 import logging
 from typing import Optional

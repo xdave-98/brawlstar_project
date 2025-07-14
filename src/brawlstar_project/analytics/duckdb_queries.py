@@ -6,6 +6,7 @@ import pandas as pd
 # Hardcoded absolute path to the cleaned data directory
 DATA_DIR = Path("/home/xavierdave/workspace/projects/brawlstar_project/data/cleaned")
 
+
 def get_player_matches(player_tag: str, n_matches: int = 25) -> pd.DataFrame:
     con = duckdb.connect()
     query = f"""
@@ -18,6 +19,7 @@ def get_player_matches(player_tag: str, n_matches: int = 25) -> pd.DataFrame:
     df = con.execute(query).df()
     con.close()
     return df
+
 
 def get_club_winrate(club_tag: str) -> pd.DataFrame:
     con = duckdb.connect()

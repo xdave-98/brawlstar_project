@@ -1,3 +1,4 @@
+from .config_utils import load_pipeline_config
 from .json_utils import (
     convert_all_json_to_parquet_partitioned,
     fetch_club_data,
@@ -20,4 +21,5 @@ __all__ = [
     "flatten_battlelog_data",
     "flatten_club_data",
     "flatten_club_members_data",
+    "load_pipeline_config",
 ]

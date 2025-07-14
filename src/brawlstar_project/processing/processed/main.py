@@ -1,3 +1,11 @@
+"""
+This script processes and cleans silver data (processed stage) for all or specific entities and dates.
+- Use --mode to select which entity to process (default: all).
+- Use --date to select the date partition (default: today).
+- Intended for batch, Airflow, or ad-hoc runs.
+- For full pipeline, use unified_main.py.
+"""
+
 import argparse
 import logging
 
