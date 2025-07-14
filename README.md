@@ -2,6 +2,8 @@
 ![License](https://img.shields.io/github/license/xdave-98/brawlstar_project)
 ![Portfolio](https://img.shields.io/badge/portfolio-project-orange)
 
+[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://brawlstarproject-xdave-98.streamlit.app/)
+
 # Brawl Stars Data Engineering Project
 
 A robust, production-grade data pipeline and analytics dashboard for Brawl Stars, built to demonstrate advanced data engineering skills using Python, Polars, DuckDB, and modern best practices.
