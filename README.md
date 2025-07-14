@@ -1,6 +1,5 @@
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![License](https://img.shields.io/github/license/xdave-98/brawlstar_project)
-![Build](https://github.com/xdave-98/brawlstar_project/actions/workflows/ci.yml/badge.svg)
 ![Portfolio](https://img.shields.io/badge/portfolio-project-orange)
 
 # Brawl Stars Data Engineering Project
@@ -23,11 +22,12 @@ The game has two main components:
 
 This project is **personal** and designed to showcase my expertise in both:
 
-- **Data Engineering**: End-to-end pipeline (ingestion, validation, transformation, analytics, dashboard), dimensional modeling, analytics, and scalable architecture. The pipeline is organized using a **medallion architecture**—where `raw` = **bronze**, `processed` = **silver**, and `cleaned` = **gold**—to ensure data quality and clear separation of concerns at each stage.
-- **Programming & Software Engineering**: Modern Python, OOP, Factory/Design patterns, code hierarchy, reproducibility, automated testing, and best practices for maintainable, production-grade code. 
+- **Data Engineering**: End-to-end pipeline (ingestion, validation, transformation, analytics, dashboard), dimensional modeling, analytics, and scalable architecture. 
+The pipeline is organized using a **medallion architecture** — where `raw` = **bronze**, `processed` = **silver**, and `cleaned` = **gold** — to ensure data quality and clear separation of concerns at each stage.
+- **Programming & Software Engineering**: Modern Python, OOP, Factory/Design patterns, code hierarchy, reproducibility, automated testing, and best practices for maintainable, production-grade code.
 The codebase is structured to follow strong software engineering principles, including the SOLID principles, to ensure clarity, extensibility, and maintainability.
 
-> **Note:** This project is **not intended for production use**. Its primary goal is to demonstrate my strengths and approach as a data engineer developer. I am fully aware that many aspects can be improved or made more robust (see the TODO/Must-Have Improvements section below), but I am proud of this solid foundation and the learning it represents.
+> **Note:** This primary goal's project is to demonstrate my strengths and approach as a data engineer developer. I am fully aware that many aspects can be improved or made more robust (see the TODO/Must-Have Improvements section below), but I am proud of this solid foundation and the learning it represents.
 
 The goal is to demonstrate not only my ability to build robust data pipelines and analytics, but also my commitment to clean, extensible, and reproducible codebases.
 
@@ -44,7 +44,8 @@ The goal is to demonstrate not only my ability to build robust data pipelines an
 
 ---
 
-## 🗂️ Project Structure
+<details>
+<summary><strong>Project Structure</strong> (click to expand)</summary>
 
 ```
 brawlstar_project/
@@ -105,10 +106,12 @@ brawlstar_project/
 
 **Notes:**
 - All data model schemas and sample data structure are described in [`data/sample/README.md`](data/sample/README.md).
-- The `src/brawlstar_project/processing` directory is organized by ETL stage: `ingested` (raw API), `raw` (conversion), `processed` (aggregation), `cleaned` (final analytics tables).
+- The `src/brawlstar_project/processing` directory is organized by ETL stage: `ingested` (raw API), `raw` (bronze), `processed` (silver), `cleaned` (gold).
 - The `entities` directory contains all Pydantic models and domain logic for players, clubs, and tags.
 - The `analytics` directory contains all analytical SQL queries, organized by domain (player, club, global).
 - The `streamlit_app` directory contains the dashboard code.
+
+</details>
 
 ---
 
@@ -123,7 +126,7 @@ API Request → JSON Validation (Pydantic) → Parquet Conversion → Processing
 - **API Request**: Fetch data from the Brawl Stars API
 - **JSON Validation (Pydantic)**: Validate and parse raw JSON using Pydantic models
 - **Parquet Conversion**: Store validated data as Parquet files for efficient analytics
-- **Processing**: Aggregate, join, and transform data for analytics
+- **Processing**: Clean, transform and enrich the data for analytics
 - **Analysis**: Final cleaned datasets ready for dashboarding and exploration
 
 ---
