@@ -1,10 +1,10 @@
 import logging
 from datetime import datetime
-from pathlib import Path
 from typing import Optional
 
 import polars as pl
 
+from brawlstar_project.constants.paths import DATA_PROCESSED_DIR, DATA_RAW_DIR
 from brawlstar_project.entities.club import Club
 from brawlstar_project.entities.player import Player
 
@@ -20,8 +20,8 @@ class PlayerProcessingRunner(BaseRunner):
     def run(self, date: Optional[str] = None, **kwargs):
         if date is None:
             date = datetime.today().strftime("%Y-%m-%d")
-        raw_base = Path("data/raw")
-        processed_base = Path("data/processed")
+        raw_base = DATA_RAW_DIR
+        processed_base = DATA_PROCESSED_DIR
         player_in = raw_base / "player" / date / "player.parquet"
         player_out = processed_base / "player" / date / "player.parquet"
         if player_in.exists():
@@ -39,8 +39,8 @@ class BattlelogProcessingRunner(BaseRunner):
     def run(self, date: Optional[str] = None, **kwargs):
         if date is None:
             date = datetime.today().strftime("%Y-%m-%d")
-        raw_base = Path("data/raw")
-        processed_base = Path("data/processed")
+        raw_base = DATA_RAW_DIR
+        processed_base = DATA_PROCESSED_DIR
         battlelog_in = raw_base / "player" / date / "battlelog.parquet"
         battlelog_out = processed_base / "player" / date / "battlelog.parquet"
         if battlelog_in.exists():
@@ -58,8 +58,8 @@ class ClubProcessingRunner(BaseRunner):
     def run(self, date: Optional[str] = None, **kwargs):
         if date is None:
             date = datetime.today().strftime("%Y-%m-%d")
-        raw_base = Path("data/raw")
-        processed_base = Path("data/processed")
+        raw_base = DATA_RAW_DIR
+        processed_base = DATA_PROCESSED_DIR
         club_in = raw_base / "club" / date / "club.parquet"
         club_out = processed_base / "club" / date / "club.parquet"
         if club_in.exists():
@@ -77,8 +77,8 @@ class ClubMembersProcessingRunner(BaseRunner):
     def run(self, date: Optional[str] = None, **kwargs):
         if date is None:
             date = datetime.today().strftime("%Y-%m-%d")
-        raw_base = Path("data/raw")
-        processed_base = Path("data/processed")
+        raw_base = DATA_RAW_DIR
+        processed_base = DATA_PROCESSED_DIR
         club_members_in = raw_base / "club" / date / "club_members.parquet"
         club_members_out = processed_base / "club" / date / "club_members.parquet"
         if club_members_in.exists():

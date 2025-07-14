@@ -3,6 +3,8 @@ from pathlib import Path
 
 import polars as pl
 
+from brawlstar_project.constants.paths import DATA_CLEANED_DIR, DATA_PROCESSED_DIR
+
 from .base_dimension_processor import BaseDimensionProcessor
 
 logger = logging.getLogger(__name__)
@@ -15,13 +17,11 @@ class DimGameModesProcessor(BaseDimensionProcessor):
 
     def get_source_path(self) -> Path:
         """Get the path to processed battlelog data."""
-        processed_base = Path("data/processed")
-        return processed_base / "player" / self.date / "battlelog.parquet"
+        return DATA_PROCESSED_DIR / "player" / self.date / "battlelog.parquet"
 
     def get_output_path(self) -> Path:
         """Get the output path for dim_game_modes."""
-        cleaned_base = Path("data/cleaned")
-        return cleaned_base / "dim_game_modes" / self.date / "dim_game_modes.parquet"
+        return DATA_CLEANED_DIR / "dim_game_modes" / self.date / "dim_game_modes.parquet"
 
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_game_modes table by extracting unique game modes."""

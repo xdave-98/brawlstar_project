@@ -7,6 +7,11 @@ from typing import Callable, Optional
 
 import polars as pl
 
+from brawlstar_project.constants.paths import (
+    DATA_INGESTED_DIR,
+    DATA_RAW_DIR,
+)
+
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -39,16 +44,16 @@ def save_json_data_partitioned(
         data = validate_func(data)
 
     today = datetime.today().strftime("%Y-%m-%d")
-    dir_path = os.path.join("data/ingested", data_type, tag, today)
+    dir_path = DATA_INGESTED_DIR / data_type / tag / today
     os.makedirs(dir_path, exist_ok=True)
 
-    file_path = os.path.join(dir_path, filename)
+    file_path = dir_path / filename
 
     with open(file_path, "w") as f:
         json.dump(data, f, indent=2)
 
     logger.info(f"Data saved in: {file_path}")
-    return file_path
+    return str(file_path)
 
 
 # Partitioned save functions
@@ -222,7 +227,7 @@ def convert_jsons_to_parquet_per_date_partitioned(
 
 
 def convert_all_json_to_parquet_partitioned(
-    ingested_base_dir: str = "data/ingested", raw_base_dir: str = "data/raw"
+    ingested_base_dir: str = str(DATA_INGESTED_DIR), raw_base_dir: str = str(DATA_RAW_DIR)
 ):
     """
     Convert JSON files to Parquet files for partitioned structure.
