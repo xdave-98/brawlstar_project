@@ -5,6 +5,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+os.environ["STREAMLIT_CLOUD"] = "1"
+
 # 🧹 Robustly add src/ to PYTHONPATH to import the module
 project_root = Path(__file__).resolve().parent.parent
 src_path = project_root / "src"
