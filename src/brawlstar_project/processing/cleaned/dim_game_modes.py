@@ -21,7 +21,9 @@ class DimGameModesProcessor(BaseDimensionProcessor):
 
     def get_output_path(self) -> Path:
         """Get the output path for dim_game_modes."""
-        return DATA_CLEANED_DIR / "dim_game_modes" / self.date / "dim_game_modes.parquet"
+        return (
+            DATA_CLEANED_DIR / "dim_game_modes" / self.date / "dim_game_modes.parquet"
+        )
 
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_game_modes table by extracting unique game modes."""

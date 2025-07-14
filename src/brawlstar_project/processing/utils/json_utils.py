@@ -227,7 +227,8 @@ def convert_jsons_to_parquet_per_date_partitioned(
 
 
 def convert_all_json_to_parquet_partitioned(
-    ingested_base_dir: str = str(DATA_INGESTED_DIR), raw_base_dir: str = str(DATA_RAW_DIR)
+    ingested_base_dir: str = str(DATA_INGESTED_DIR),
+    raw_base_dir: str = str(DATA_RAW_DIR),
 ):
     """
     Convert JSON files to Parquet files for partitioned structure.

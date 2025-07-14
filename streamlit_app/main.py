@@ -1,16 +1,29 @@
+import os
 import sys
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
-# 🧹 Add src/ to PYTHONPATH to import the module
-sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
+# 🧹 Robustly add src/ to PYTHONPATH to import the module
+project_root = Path(__file__).resolve().parent.parent
+src_path = project_root / "src"
+if src_path.exists():
+    sys.path.insert(0, str(src_path))
+else:
+    # Try fallback: look for src/ in CWD (for Streamlit Cloud)
+    fallback_src = Path(os.getcwd()) / "src"
+    if fallback_src.exists():
+        sys.path.insert(0, str(fallback_src))
+    else:
+        st.error(f"❌ Could not find src/ directory at {src_path} or {fallback_src}")
+        st.stop()
 
-from brawlstar_project.analytics import duckdb_queries as dq
-from brawlstar_project.constants.paths import DATA_CLEANED_DIR
+from brawlstar_project.analytics import duckdb_queries as dq  # noqa: E402
+from brawlstar_project.constants.paths import DATA_CLEANED_DIR  # noqa: E402
 
 st.title("BrawlStars Dashboard")
+
 
 # Find the latest date partition in cleaned data
 def get_latest_partition(base_dir, dim_folder):
@@ -22,6 +35,7 @@ def get_latest_partition(base_dir, dim_folder):
         return None
     return max(dates)
 
+
 # Load dimension tables
 def load_dim_players():
     date = get_latest_partition(DATA_CLEANED_DIR, "dim_players")
@@ -32,6 +46,7 @@ def load_dim_players():
         return pd.DataFrame()
     return pd.read_parquet(path)
 
+
 def load_dim_clubs():
     date = get_latest_partition(DATA_CLEANED_DIR, "dim_clubs")
     if not date:
@@ -41,6 +56,7 @@ def load_dim_clubs():
         return pd.DataFrame()
     return pd.read_parquet(path)
 
+
 # User chooses between Player or Club
 mode = st.radio("Select analysis type:", ["Player", "Club"], index=0)
 
@@ -49,7 +65,9 @@ if mode == "Player":
     if dim_players.empty:
         st.warning("No players available in the dimension table.")
         st.stop()
-    player_options = [f"{row['name']} ({row['tag']})" for _, row in dim_players.iterrows()]
+    player_options = [
+        f"{row['name']} ({row['tag']})" for _, row in dim_players.iterrows()
+    ]
     player_selection = st.selectbox("Select a player", player_options)
     # Extract tag from selection
     player_tag = player_selection.split("(")[-1].replace(")", "").strip()
