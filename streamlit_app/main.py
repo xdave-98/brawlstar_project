@@ -84,7 +84,7 @@ if mode == "Player":
 
     st.header("Player vs Club Winrate")
     # Player winrate: last n_matches games; Club winrate: last 100 games (or less)
-    winrate_comp = pq.get_player_vs_club_winrate(player_tag, n_matches)
+    winrate_comp = pq.get_player_vs_club_winrate(fact_matches_path, player_tag, n_matches)
     club_winrate_100 = None
     club_tag = winrate_comp["club_tag"] if winrate_comp else None
     if club_tag:
