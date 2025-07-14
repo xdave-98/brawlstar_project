@@ -21,12 +21,17 @@ class DimMapsProcessor(BaseDimensionProcessor):
 
     def get_output_path(self) -> Path:
         """Get the output path for dim_maps."""
-        return DATA_CLEANED_DIR / "dim_maps" / self.date / "dim_maps.parquet"
+        return DATA_CLEANED_DIR / "dim_maps.parquet"
 
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_maps table by extracting unique maps."""
         self.logger.info("Building dim_maps table...")
         dim_maps_df = source_df.select("map_name").unique(subset=["map_name"])
+
+        # Add _process_date column as a date type
+        dim_maps_df = dim_maps_df.with_columns(
+            pl.lit(self.date).str.strptime(pl.Date, "%Y-%m-%d").alias("_process_date")
+        )
 
         self.logger.info(f"Built dim_maps table with {len(dim_maps_df)} rows")
         return dim_maps_df

@@ -21,7 +21,7 @@ class DimPlayersProcessor(BaseDimensionProcessor):
 
     def get_output_path(self) -> Path:
         """Get the output path for dim_players."""
-        return DATA_CLEANED_DIR / "dim_players" / self.date / "dim_players.parquet"
+        return DATA_CLEANED_DIR / "dim_players.parquet"
 
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_players table from player data with club role."""
@@ -82,6 +82,11 @@ class DimPlayersProcessor(BaseDimensionProcessor):
             dim_players_df = dim_players_df.with_columns(
                 pl.lit(None).alias("club_role")
             ).select(OUTPUT_DIM_PLAYERS_COLS)
+
+        # Add _process_date column as a date type
+        dim_players_df = dim_players_df.with_columns(
+            pl.lit(self.date).str.strptime(pl.Date, "%Y-%m-%d").alias("_process_date")
+        )
 
         self.logger.info(f"Built dim_players table with {len(dim_players_df)} rows")
         return dim_players_df

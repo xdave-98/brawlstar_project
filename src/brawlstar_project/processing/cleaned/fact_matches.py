@@ -119,6 +119,11 @@ class FactMatchesProcessor:
             ]
         )
 
+        # Add _process_date column as a date type
+        fact_matches_df = fact_matches_df.with_columns(
+            pl.lit(self.date).str.strptime(pl.Date, "%Y-%m-%d").alias("_process_date")
+        )
+
         self.logger.info(f"Built fact_matches table with {len(fact_matches_df)} rows")
         return fact_matches_df
 
@@ -134,7 +139,7 @@ class FactMatchesProcessor:
             return
 
         cleaned_base = Path("data/cleaned")
-        output_path = cleaned_base / "fact_matches" / self.date / "fact_matches.parquet"
+        output_path = cleaned_base / "fact_matches.parquet"
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         self.logger.info(f"Saving fact_matches to {output_path}")
