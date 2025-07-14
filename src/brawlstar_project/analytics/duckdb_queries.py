@@ -23,7 +23,7 @@ def get_club_winrate(club_tag: str) -> pd.DataFrame:
     con = duckdb.connect()
     query = f"""
         SELECT club_tag, COUNT(*) AS total_games,
-               SUM(CASE WHEN result = 'victory' THEN 1 ELSE 0 END) AS wins
+               SUM(CASE WHEN battle_result = 'victory' THEN 1 ELSE 0 END) AS wins
         FROM read_parquet('{DATA_CLEANED_DIR}/fact_matches/*/*.parquet')
         WHERE club_tag = '{club_tag}'
         GROUP BY club_tag
