@@ -21,7 +21,7 @@ class DimClubsProcessor(BaseDimensionProcessor):
     def get_output_path(self) -> Path:
         """Get the output path for dim_clubs."""
         cleaned_base = Path("data/cleaned")
-        return cleaned_base / "dim_clubs" / self.date / "dim_clubs.parquet"
+        return cleaned_base / "dim_clubs.parquet"
 
     def build_dimension(self, source_df: pl.DataFrame) -> pl.DataFrame:
         """Build dim_clubs table from club data."""
@@ -40,6 +40,11 @@ class DimClubsProcessor(BaseDimensionProcessor):
             source_df.select(OUTPUT_DIM_CLUB_COLS).unique(
                 subset=["tag"]
             )  # Ensure one row per club
+        )
+
+        # Add _process_date column as a date type
+        dim_clubs_df = dim_clubs_df.with_columns(
+            pl.lit(self.date).str.strptime(pl.Date, "%Y-%m-%d").alias("_process_date")
         )
 
         self.logger.info(f"Built dim_clubs table with {len(dim_clubs_df)} rows")

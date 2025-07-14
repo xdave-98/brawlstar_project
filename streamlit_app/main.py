@@ -39,10 +39,7 @@ def get_latest_partition(base_dir, dim_folder):
 # Load dimension tables
 def load_dim_players():
     data_root = get_data_root()
-    date = get_latest_partition(data_root, "dim_players")
-    if not date:
-        return pd.DataFrame()
-    path = data_root / "dim_players" / date / "dim_players.parquet"
+    path = data_root / "dim_players.parquet"
     if not path.exists():
         return pd.DataFrame()
     return pd.read_parquet(path)
@@ -50,10 +47,7 @@ def load_dim_players():
 
 def load_dim_clubs():
     data_root = get_data_root()
-    date = get_latest_partition(data_root, "dim_clubs")
-    if not date:
-        return pd.DataFrame()
-    path = data_root / "dim_clubs" / date / "dim_clubs.parquet"
+    path = data_root / "dim_clubs.parquet"
     if not path.exists():
         return pd.DataFrame()
     return pd.read_parquet(path)
