@@ -1,33 +1,33 @@
+from pathlib import Path
+
 import duckdb
+import pandas as pd
 
-con = duckdb.connect()
+# Hardcoded absolute path to the cleaned data directory
+DATA_DIR = Path("/home/xavierdave/workspace/projects/brawlstar_project/data/cleaned")
 
-# Test query to check available data
-print("🔍 Checking available data...")
-df = con.execute("""
-    SELECT * FROM 'data/cleaned/fact_matches/2025-07-14/fact_matches.parquet' 
-    LIMIT 5
-""").df()
+def get_player_matches(player_tag: str, n_matches: int = 25) -> pd.DataFrame:
+    con = duckdb.connect()
+    query = f"""
+        SELECT *
+        FROM read_parquet('{DATA_DIR}/fact_matches/*/*.parquet')
+        WHERE player_tag = '{player_tag}'
+        ORDER BY battle_time DESC
+        LIMIT {n_matches}
+    """
+    df = con.execute(query).df()
+    con.close()
+    return df
 
-print("📊 Sample data from fact_matches:")
-print(df)
-print("\n" + "="*50 + "\n")
-
-# Simple analytics query: count matches per day per player, ordered by total_matches (using CTE)
-print("📈 Running simple analytics query with CTE...")
-analytics_df = con.execute("""
-    WITH match_counts AS (
-        SELECT 
-            battle_time_date, 
-            player_tag,
-            COUNT(*) AS total_matches
-        FROM 'data/cleaned/fact_matches/2025-07-14/fact_matches.parquet'
-        GROUP BY battle_time_date, player_tag
-    )
-    SELECT *
-    FROM match_counts
-    ORDER BY total_matches DESC, battle_time_date, player_tag
-""").df()
-
-print("📊 Matches per day per player (ordered by total_matches):")
-print(analytics_df)
+def get_club_winrate(club_tag: str) -> pd.DataFrame:
+    con = duckdb.connect()
+    query = f"""
+        SELECT club_tag, COUNT(*) AS total_games,
+               SUM(CASE WHEN result = 'victory' THEN 1 ELSE 0 END) AS wins
+        FROM read_parquet('{DATA_DIR}/fact_matches/*/*.parquet')
+        WHERE club_tag = '{club_tag}'
+        GROUP BY club_tag
+    """
+    df = con.execute(query).df()
+    con.close()
+    return df

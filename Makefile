@@ -101,6 +101,14 @@ run-club-players-pipeline:
 	@echo "📊 Step 3: Analyze all players..."
 	$(MAKE) run-all-players-analysis
 
+# =========================================================================
+# Streamlit App Command
+# =========================================================================
+
+run-streamlit:
+	@echo "🚀 Running Streamlit app..."
+	PYTHONPATH=src streamlit run streamlit_app/main.py
+
 # ============================================================================
 # Development Commands
 # ============================================================================
@@ -192,5 +200,8 @@ help:
 	@echo "  format                    - Format code"
 	@echo "  clean                     - Clean cache files"
 	@echo "  clean-data                - Clean all data"
+	@echo ""
+	@echo "🌐 Streamlit:"
+	@echo "  run-streamlit             - Run the Streamlit dashboard app"
 
 .PHONY: help test lint fix format clean clean-data clean-ingested clean-raw clean-processed clean-all run-player-pipeline run-club-pipeline run-club-players-pipeline
