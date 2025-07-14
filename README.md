@@ -137,6 +137,8 @@ The project uses a **star schema** (star model) for analytics, with the followin
 
 - **dim_players**: Player attributes (tag, name, club, etc.)
 - **dim_clubs**: Club attributes (tag, name, members, etc.)
+- **dim_game_modes**: Game mode attributes (battle_mode)
+- **dim_maps**: Map attributes (map_name)
 - **fact_matches**: Match-level facts (player, club, mode, result, timestamp, etc.)
 
 All models are defined using Pydantic for type safety and validation.  
@@ -328,3 +330,9 @@ The dashboard auto-selects the data source:
   - Add advanced analytics (e.g., churn prediction, player segmentation, anomaly detection)
 
 ---
+
+## 🙏 Final Note
+
+Thank you for taking the time to explore this project! Your interest and feedback are greatly appreciated. If you have any questions, suggestions, or just want to connect, feel free to reach out via [GitHub Discussions](https://github.com/xdave-98/brawlstar_project/discussions) or directly.
+
+Happy brawling and happy data engineering!

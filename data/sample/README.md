@@ -4,15 +4,15 @@ This folder contains small, non-sensitive sample datasets for demo and testing p
 
 ## Directory Structure
 
-Sample data is organized to mirror the production/cleaned data structure, with each table partitioned by date:
+Sample data is organized to mirror the production/cleaned data structure. Each table is stored as a single Parquet file:
 
 ```
 data/sample/
-  dim_players/2025-07-14/dim_players.parquet
-  dim_clubs/2025-07-14/dim_clubs.parquet
-  dim_maps/2025-07-14/dim_maps.parquet
-  dim_game_modes/2025-07-14/dim_game_modes.parquet
-  fact_matches/2025-07-14/fact_matches.parquet
+  dim_players.parquet
+  dim_clubs.parquet
+  dim_maps.parquet
+  dim_game_modes.parquet
+  fact_matches.parquet
 ```
 
 ## Files & Schemas
@@ -20,33 +20,41 @@ data/sample/
 - **dim_players.parquet**
   - `tag` (str): Unique player tag
   - `name` (str): Player name
-  - `trophies` (int): Current trophy count
-  - `exp_level` (int): Experience level
   - `club_tag` (str, nullable): Club tag if player is in a club
+  - `club_role` (str, nullable): Player's role in the club (if any)
+  - `trophies` (int): Current trophy count
+  - `highest_trophies` (int): Highest trophy count achieved
+  - `exp_level` (int): Experience level
+  - `exp_points` (int): Experience points
+  - `_process_date` (date): Date the record was processed
 
 - **dim_clubs.parquet**
   - `tag` (str): Unique club tag
   - `name` (str): Club name
-  - `members_count` (int): Number of members
+  - `description` (str, nullable): Club description
   - `trophies` (int): Total club trophies
+  - `required_trophies` (int): Trophies required to join
+  - `member_count` (int): Number of members
+  - `_process_date` (date): Date the record was processed
 
 - **dim_maps.parquet**
-  - `map_id` (int): Unique map identifier
-  - `name` (str): Map name
-  - `game_mode` (str): Game mode for the map
+  - `map_name` (str): Name of the map
+  - `_process_date` (date): Date the record was processed
 
 - **dim_game_modes.parquet**
-  - `mode_id` (int): Unique mode identifier
-  - `name` (str): Game mode name
-  - `description` (str): Description of the mode
+  - `battle_mode` (str): Name of the game mode
+  - `_process_date` (date): Date the record was processed
 
 - **fact_matches.parquet**
-  - `match_id` (int): Unique match identifier
-  - `timestamp` (str): ISO timestamp
-  - `map_id` (int): Map played
-  - `mode_id` (int): Game mode played
-  - `winner_tag` (str): Winning player tag
-  - `duration` (int): Match duration (seconds)
+  - `match_id` (str): Unique match identifier - <player_tag>-<battle_time>-<map_name>
+  - `battle_time` (datetime): Timestamp of the match
+  - `battle_time_date` (date): Date of the match
+  - `player_tag` (str): Player tag
+  - `club_tag` (str, nullable): Club tag (if any)
+  - `map_name` (str): Name of the map played
+  - `battle_mode` (str): Game mode
+  - `battle_result` (str): Result of the match (e.g., victory, defeat)
+  - `_process_date` (date): Date the record was processed
 
 ## Usage
 
