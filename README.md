@@ -150,6 +150,36 @@ make format
 
 ---
 
+## 📊 Streamlit App Data Source Selection
+
+The Streamlit dashboard automatically selects the data source based on your environment:
+
+- **Local Development:**
+  - By default, uses your local cleaned data (`data/cleaned/`).
+  - To override, set the `BRAWLSTARS_DATA_ROOT` environment variable (e.g., in `.env.local`) to your preferred data directory.
+
+- **Streamlit Cloud:**
+  - Automatically uses the sample data in `data/sample/` (included in the repo) for demo/testing.
+
+### How it works
+
+The app uses a utility function (`get_data_root()`) to determine the data directory:
+
+1. If `BRAWLSTARS_DATA_ROOT` is set, that directory is used.
+2. If running on Streamlit Cloud, `data/sample/` is used.
+3. Otherwise, defaults to `data/cleaned/`.
+
+**Example for local override:**
+
+Add to your `.env.local`:
+```
+BRAWLSTARS_DATA_ROOT=data/cleaned
+```
+
+**No changes are needed for Streamlit Cloud deployments.**
+
+---
+
 ## 🧩 Key Technologies
 
 - **Python 3.12+**: Modern Python with type hints

@@ -20,14 +20,14 @@ else:
         st.stop()
 
 from brawlstar_project.analytics import duckdb_queries as dq  # noqa: E402
-from brawlstar_project.constants.paths import DATA_CLEANED_DIR  # noqa: E402
+from brawlstar_project.constants.paths import get_data_root  # noqa: E402
 
 st.title("BrawlStars Dashboard")
 
 
 # Find the latest date partition in cleaned data
 def get_latest_partition(base_dir, dim_folder):
-    dim_path = DATA_CLEANED_DIR / dim_folder
+    dim_path = base_dir / dim_folder
     if not dim_path.exists():
         return None
     dates = [d.name for d in dim_path.iterdir() if d.is_dir()]
@@ -38,20 +38,22 @@ def get_latest_partition(base_dir, dim_folder):
 
 # Load dimension tables
 def load_dim_players():
-    date = get_latest_partition(DATA_CLEANED_DIR, "dim_players")
+    data_root = get_data_root()
+    date = get_latest_partition(data_root, "dim_players")
     if not date:
         return pd.DataFrame()
-    path = DATA_CLEANED_DIR / "dim_players" / date / "dim_players.parquet"
+    path = data_root / "dim_players" / date / "dim_players.parquet"
     if not path.exists():
         return pd.DataFrame()
     return pd.read_parquet(path)
 
 
 def load_dim_clubs():
-    date = get_latest_partition(DATA_CLEANED_DIR, "dim_clubs")
+    data_root = get_data_root()
+    date = get_latest_partition(data_root, "dim_clubs")
     if not date:
         return pd.DataFrame()
-    path = DATA_CLEANED_DIR / "dim_clubs" / date / "dim_clubs.parquet"
+    path = data_root / "dim_clubs" / date / "dim_clubs.parquet"
     if not path.exists():
         return pd.DataFrame()
     return pd.read_parquet(path)

@@ -1,4 +1,3 @@
-
 import yaml
 
 from brawlstar_project.constants.paths import CONFIG_DIR
