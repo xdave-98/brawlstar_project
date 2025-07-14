@@ -1,18 +1,46 @@
-# Brawl Stars Data Analysis Project
+![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+![License](https://img.shields.io/github/license/xdave-98/brawlstar_project)
+![Build](https://github.com/xdave-98/brawlstar_project/actions/workflows/ci.yml/badge.svg)
+![Portfolio](https://img.shields.io/badge/portfolio-project-orange)
 
-A robust, production-grade data pipeline for Brawl Stars player and battlelog analytics, built with Python, Polars, and Pydantic. This project demonstrates best practices in data engineering: modular ETL, type safety, reproducibility, and automated testing.
+# Brawl Stars Data Engineering Project
+
+A robust, production-grade data pipeline and analytics dashboard for Brawl Stars, built to demonstrate advanced data engineering skills using Python, Polars, DuckDB, and modern best practices.
 
 ---
 
-## 🚀 Features
+## 🏆 What is Brawl Stars?
 
-- **Ingestion**: Fetches player and battlelog data from the Brawl Stars API
-- **Validation**: Uses Pydantic models for strict schema validation
-- **Transformation**: Converts JSON to Parquet using Polars for blazing-fast analytics
-- **Modular Pipeline**: Clean separation between ingestion, raw, and processed data
-- **Testing**: Comprehensive unit and integration tests with pytest
-- **Linting & Formatting**: Enforced by Ruff and isort (88 char line length, Black style)
-- **Pre-commit Hooks**: Ensures code quality and test passing before every commit
+[Brawl Stars](https://supercell.com/en/games/brawlstars/) is a popular real-time multiplayer mobile game by Supercell. Players compete in various game modes, collect characters ("Brawlers"), and join clubs for team-based play.
+
+The game has two main components:
+- **Players**: Each player is identified by a unique player tag (ID) and has associated stats, progression, and battle history.
+- **Clubs**: Social groups of players, each identified by a unique club tag (ID), with their own stats, membership, and activity.
+
+---
+
+## ℹ️ About This Project
+
+This project is **personal** and designed to showcase my expertise in both:
+
+- **Data Engineering**: End-to-end pipeline (ingestion, validation, transformation, analytics, dashboard), dimensional modeling, analytics, and scalable architecture. The pipeline is organized using a **medallion architecture**—where `raw` = **bronze**, `processed` = **silver**, and `cleaned` = **gold**—to ensure data quality and clear separation of concerns at each stage.
+- **Programming & Software Engineering**: Modern Python, OOP, Factory/Design patterns, code hierarchy, reproducibility, automated testing, and best practices for maintainable, production-grade code. 
+The codebase is structured to follow strong software engineering principles, including the SOLID principles, to ensure clarity, extensibility, and maintainability.
+
+> **Note:** This project is **not intended for production use**. Its primary goal is to demonstrate my strengths and approach as a data engineer developer. I am fully aware that many aspects can be improved or made more robust (see the TODO/Must-Have Improvements section below), but I am proud of this solid foundation and the learning it represents.
+
+The goal is to demonstrate not only my ability to build robust data pipelines and analytics, but also my commitment to clean, extensible, and reproducible codebases.
+
+> **Questions or feedback?** Feel free to open a discussion in the [GitHub Discussions](https://github.com/xdave-98/brawlstar_project/discussions) section, or contact me directly.
+
+---
+
+## 📦 Data Sources
+
+- **Brawl Stars API**: Player profiles, battle logs, club data
+  - Official API documentation: [https://developer.brawlstars.com/](https://developer.brawlstars.com/)
+  - You must register for a free API token to access the data. The API provides endpoints for player stats, battle logs, club information, rankings, and more.
+- **Data Lake Structure**: See [`data/sample/README.md`](data/sample/README.md) for full details
 
 ---
 
@@ -20,199 +48,162 @@ A robust, production-grade data pipeline for Brawl Stars player and battlelog an
 
 ```
 brawlstar_project/
-├── data/                          # Data lake (gitignored)
-│   ├── ingested/                  # Raw JSON from API
-│   │   └── #PLAYER_TAG/
-│   │       └── YYYY-MM-DD/
-│   │           ├── player.json    # Player profile data
-│   │           └── battlelog.json # Battle history data
-│   ├── raw/                       # Converted Parquet files
-│   │   └── #PLAYER_TAG/
-│   │       └── YYYY-MM-DD/
-│   │           ├── player.parquet
-│   │           └── battlelog.parquet
-│   ├── processed/                 # Aggregated/transformed data
-│   └── cleaned/                   # Final cleaned datasets
+├── data/                        # Data lake (see data/sample/README.md for schema)
+│   ├── ingested/                # Raw JSON from Brawl Stars API
+│   ├── raw/                     # Parquet-converted raw data
+│   ├── processed/               # Aggregated/derived features
+│   ├── cleaned/                 # Final analytics-ready datasets
+│   └── sample/                  # Sample data for demo/testing
 ├── src/
 │   └── brawlstar_project/
-│       ├── player/                # Player data models and utilities
-│       │   ├── models/
-│       │   │   ├── player.py     # Player data Pydantic models
-│       │   │   └── battlelog.py  # Battlelog data Pydantic models
-│       │   └── player.py         # Player data loading utilities
-│       └── processing/            # ETL pipeline modules
-│           ├── ingested/          # Data ingestion from API
-│           │   ├── api_client.py  # Brawl Stars API client
-│           │   ├── config.py      # API configuration
-│           │   └── main.py        # Ingestion orchestration
-│           ├── raw/               # JSON to Parquet conversion
-│           │   └── main.py        # Conversion orchestration
-│           ├── processed/         # Data processing and analysis
-│           │   ├── analysis.py    # Data analysis functions
-│           │   └── main.py        # Processing orchestration
-│           ├── cleaned/           # Data cleaning utilities
-│           └── utils.py           # Shared ETL utilities
-├── tests/                         # Unit and integration tests
-├── Makefile                       # Automation commands
-├── pyproject.toml                 # Dependencies & tool config
-├── .pre-commit-config.yaml        # Pre-commit hooks
-└── README.md
+│       ├── analytics/           # Analytical SQL queries (DuckDB)
+│       │   ├── club_queries.py
+│       │   ├── global_queries.py
+│       │   ├── player_queries.py
+│       │   └── duckdb_utils.py
+│       ├── constants/           # Project-wide constants (paths, config)
+│       ├── entities/            # Data models and domain entities
+│       │   ├── player/
+│       │   │   ├── player.py            # Player data utilities
+│       │   │   └── models/
+│       │   │       ├── player.py        # Player Pydantic model
+│       │   │       └── battlelog.py     # Battlelog Pydantic model
+│       │   ├── club/
+│       │   │   ├── club.py              # Club data utilities
+│       │   │   └── models/
+│       │   │       ├── club.py          # Club Pydantic model
+│       │   │       └── members.py       # Club members Pydantic model
+│       │   └── tag_entity.py            # Tag entity abstraction
+│       ├── processing/          # ETL pipeline modules
+│       │   ├── ingested/        # Data ingestion from API
+│       │   │   ├── api_client.py
+│       │   │   ├── config.py
+│       │   │   └── main.py
+│       │   ├── raw/             # JSON to Parquet conversion
+│       │   │   └── main.py
+│       │   ├── processed/       # Data processing and aggregation
+│       │   │   └── main.py
+│       │   ├── cleaned/         # Data cleaning and final tables
+│       │   │   ├── fact_matches.py
+│       │   │   ├── dim_clubs.py
+│       │   │   ├── dim_game_modes.py
+│       │   │   ├── dim_maps.py
+│       │   │   ├── dim_players.py
+│       │   │   ├── main.py
+│       │   │   └── base_dimension_processor.py
+│       │   ├── factory/         # (If present) Factory pattern for pipeline orchestration
+│       │   └── utils/           # Shared ETL utilities
+│       │       ├── json_utils.py
+│       │       └── config_utils.py
+├── streamlit_app/               # Streamlit dashboard app
+│   └── main.py
+├── tests/                       # Unit and integration tests
+├── .pre-commit-config.yaml      # Pre-commit hooks for linting/testing
+├── pyproject.toml               # Project dependencies and tool config
+└── README.md                    # Project documentation
 ```
+
+**Notes:**
+- All data model schemas and sample data structure are described in [`data/sample/README.md`](data/sample/README.md).
+- The `src/brawlstar_project/processing` directory is organized by ETL stage: `ingested` (raw API), `raw` (conversion), `processed` (aggregation), `cleaned` (final analytics tables).
+- The `entities` directory contains all Pydantic models and domain logic for players, clubs, and tags.
+- The `analytics` directory contains all analytical SQL queries, organized by domain (player, club, global).
+- The `streamlit_app` directory contains the dashboard code.
 
 ---
 
-## 📊 Data Structure
-
-### Data Lake Organization
-
-The project follows a data lake pattern with clear separation of concerns:
-
-#### 1. **Ingested Data** (`data/ingested/`)
-- **Location**: `data/ingested/#PLAYER_TAG/YYYY-MM-DD/`
-- **Format**: JSON files with validated schema
-- **Files**:
-  - `player.json`: Player profile and statistics
-  - `battlelog.json`: Battle history and match details
-
-#### 2. **Raw Data** (`data/raw/`)
-- **Location**: `data/raw/#PLAYER_TAG/YYYY-MM-DD/`
-- **Format**: Parquet files optimized for analytics
-- **Files**:
-  - `player.parquet`: Flattened player data
-  - `battlelog.parquet`: Normalized battle records
-
-#### 3. **Processed Data** (`data/processed/`)
-- **Purpose**: Aggregated metrics and derived features
-- **Format**: Parquet files with calculated statistics
-
-#### 4. **Cleaned Data** (`data/cleaned/`)
-- **Purpose**: Final datasets ready for analysis
-- **Format**: Parquet files with quality-assured data
-
-### Data Flow
+## 🔄 Data Flow
 
 ```
-API Request → JSON Validation → Parquet Conversion → Processing → Analysis
-     ↓              ↓                    ↓              ↓           ↓
-  ingested/     Pydantic           raw/          processed/    cleaned/
+API Request → JSON Validation (Pydantic) → Parquet Conversion → Processing → Analysis
+     ↓                ↓                        ↓                ↓           ↓
+  ingested/       Pydantic               raw/            processed/    cleaned/
 ```
+
+- **API Request**: Fetch data from the Brawl Stars API
+- **JSON Validation (Pydantic)**: Validate and parse raw JSON using Pydantic models
+- **Parquet Conversion**: Store validated data as Parquet files for efficient analytics
+- **Processing**: Aggregate, join, and transform data for analytics
+- **Analysis**: Final cleaned datasets ready for dashboarding and exploration
+
+---
+
+## 🗃️ Data Modeling
+
+The project uses a **star schema** (star model) for analytics, with the following key tables:
+
+- **dim_players**: Player attributes (tag, name, club, etc.)
+- **dim_clubs**: Club attributes (tag, name, members, etc.)
+- **fact_matches**: Match-level facts (player, club, mode, result, timestamp, etc.)
+
+All models are defined using Pydantic for type safety and validation.  
+See [`data/sample/README.md`](data/sample/README.md) for detailed schema and data structure.
+
+---
+
+## 📓 Notebooks
+
+Jupyter notebooks are included in the project to help you understand the data and explore it interactively. You can use these notebooks to:
+- Inspect and visualize the raw, processed, or cleaned data
+- Prototype new analyses or transformations
+- Experiment with feature engineering or custom metrics
+
+Feel free to run and modify the notebooks for your own exploration or to extend the project further.
 
 ---
 
 ## ⚡ Quickstart
 
-### 1. Prerequisites
+Follow these steps to install, configure, and run the project—either locally with your own data, or on Streamlit Cloud with sample data.
 
+### 1. Prerequisites
 - Python 3.12+
-- UV package manager
-- Brawl Stars API key
+- [UV](https://github.com/astral-sh/uv) package manager
+- Brawl Stars API key (register at [https://developer.brawlstars.com/](https://developer.brawlstars.com/))
 
 ### 2. Install dependencies
-
 ```bash
-# Install UV if not already installed
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install project dependencies
 uv sync
 ```
 
-### 3. Set up environment
-
+### 3. Configure your environment
 ```bash
-# Copy environment template
 cp .env.example .env
-
-# Edit .env with your API key
-# BRAWLSTARS_API_KEY=your_api_key_here
+# Edit .env to add your BRAWLSTARS_API_KEY and (optionally) set BRAWLSTARS_DATA_ROOT to your data directory
 ```
 
-### 4. Run the pipeline
+### 4. Ingest and process your own data (local mode)
 
-```bash
-# Fetch player & battlelog data from API
-make run-player-ingestion PLAYER_TAG=#YOURTAG
+- For most users, you should use the Makefile targets:
+  ```bash
+  make run-unified-pipeline PLAYER_TAG=#YOURTAG
+  make run-streamlit
+  ```
+  This will run the full pipeline and launch the dashboard.
 
-# Convert JSON to Parquet
-make run-player-raw
+- The other stage-specific targets (like `make run-ingested`, `make run-player-raw`, etc.) are available if you want to run or debug dedicated parts of the workflow.
+- See the `Makefile` for a full list of available commands and options.
 
-# Display processed data
-make run-player-processed PLAYER_TAG=#YOURTAG
-```
+### 5. Run the Streamlit dashboard
+- **Locally with your data:**
+  ```bash
+  make run-streamlit
+  ```
+  The app will use your local cleaned data (`data/cleaned/`) by default, or the directory specified in your `.env` as `BRAWLSTARS_DATA_ROOT`.
 
-### 5. Run tests & lint
+- **On Streamlit Cloud:**
+  - The app will automatically use the fixed sample data in `data/sample/` (no API key or custom config needed).
+  - This is ideal for demo/testing or if you want to see the dashboard without ingesting your own data.
 
+### 6. Load your own data/config
+- To use your own data, set the `BRAWLSTARS_DATA_ROOT` variable in your `.env` to point to your data directory (e.g., `data/cleaned/`).
+- You can customize the ingestion and processing by editing the config files in `src/brawlstar_project/processing/ingested/config.py` or by extending the pipeline.
+
+### 7. Test & Lint
 ```bash
 make test
 make lint
 make format
-```
-
----
-
-## 📊 Streamlit App Data Source Selection
-
-The Streamlit dashboard automatically selects the data source based on your environment:
-
-- **Local Development:**
-  - By default, uses your local cleaned data (`data/cleaned/`).
-  - To override, set the `BRAWLSTARS_DATA_ROOT` environment variable (e.g., in `.env`) to your preferred data directory.
-
-- **Streamlit Cloud:**
-  - Automatically uses the sample data in `data/sample/` (included in the repo) for demo/testing.
-
-### How it works
-
-The app uses a utility function (`get_data_root()`) to determine the data directory:
-
-1. If `BRAWLSTARS_DATA_ROOT` is set, that directory is used.
-2. If running on Streamlit Cloud, `data/sample/` is used.
-3. Otherwise, defaults to `data/cleaned/`.
-
-**Example for local override:**
-
-Add to your `.env`:
-```
-BRAWLSTARS_DATA_ROOT=data/cleaned
-```
-
-**No changes are needed for Streamlit Cloud deployments.**
-
----
-
-## 🧩 Key Technologies
-
-- **Python 3.12+**: Modern Python with type hints
-- **Polars**: Lightning-fast DataFrame library
-- **Pydantic**: Type-safe data validation
-- **UV**: Fast Python package manager
-- **isort**: Import sorting (Black-compatible)
-- **Ruff**: Linting & formatting
-- **pytest**: Testing framework
-- **pre-commit**: Git hooks for code quality
-
----
-
-## 📝 Example Usage
-
-### Basic Data Loading
-
-```python
-from brawlstar_project.player.player import Player
-
-# Load player data
-player = Player("#PC0PPLRU")
-player_data = player.load_player_data(Path("data/raw"), days=7)
-battlelog_data = player.load_battlelog_data(Path("data/raw"), days=7)
-```
-
-### Custom Analysis
-
-```python
-from brawlstar_project.processing.processed.analysis import analyze_player_performance
-
-# Analyze player performance over time
-performance_df = analyze_player_performance("data/raw", "#PC0PPLRU", days=30)
 ```
 
 ---
@@ -232,18 +223,16 @@ make test-coverage
 make test-pydantic
 ```
 
-### Test Structure
-
-- **Unit Tests**: Test individual functions and classes
-- **Integration Tests**: Test data pipeline end-to-end
-- **Model Tests**: Validate Pydantic model behavior
+**Test Structure:**
+- **Unit Tests:** Test individual functions and classes
+- **Integration Tests:** Test data pipeline end-to-end
+- **Model Tests:** Validate Pydantic model behavior
 
 ---
 
 ## 🛠️ Code Quality
 
-### Linting & Formatting
-
+**Linting & Formatting**
 ```bash
 # Check code quality
 make lint
@@ -258,115 +247,81 @@ make format
 make sort-imports
 ```
 
-### Pre-commit Hooks
-
+**Pre-commit Hooks:**  
 The project uses pre-commit hooks to ensure code quality:
+- **Ruff:** Linting and formatting
+- **isort:** Import sorting
+- **pytest:** Test execution
+- **Black-compatible:** 88-character line length
 
-- **Ruff**: Linting and formatting
-- **isort**: Import sorting
-- **pytest**: Test execution
-- **Black-compatible**: 88-character line length
-
----
-
-## 🔧 Development Setup
-
-### 1. Clone and setup
-
-```bash
-git clone <your-repo>
-cd brawlstar_project
-uv sync
-```
-
-### 2. Install pre-commit hooks
-
-```bash
-pre-commit install
-```
-
-### 3. Create environment file
-
-```bash
-cp .env.example .env
-# Edit .env with your API key
-```
-
-### 4. Run initial pipeline
-
-```bash
-make run-player-ingestion PLAYER_TAG=#YOURTAG
-make run-player-raw
-```
+*See the Makefile for all available commands.*
 
 ---
 
-## 📈 Data Analysis Examples
+## 🚦 Streamlit App Data Source
 
-### Player Statistics
+The dashboard auto-selects the data source:
+- **Local**: Uses your local cleaned data (`data/cleaned/`)
+- **Streamlit Cloud**: Uses sample data (`data/sample/`)
+- Override with `BRAWLSTARS_DATA_ROOT` in your `.env` if needed.
 
-```python
-import polars as pl
-from pathlib import Path
-
-# Load player data
-df = pl.read_parquet("data/raw/#PC0PPLRU/2025-01-15/player.parquet")
-
-# Basic statistics
-print(df.describe())
-
-# Trophy progression
-trophy_stats = df.select([
-    "name", "trophies", "highestTrophies", "powerLeaguePoints"
-])
-```
-
-### Battle Analysis
-
-```python
-# Load battlelog data
-battle_df = pl.read_parquet("data/raw/#PC0PPLRU/2025-01-15/battlelog.parquet")
-
-# Battle statistics
-battle_stats = battle_df.group_by("mode").agg([
-    pl.count().alias("total_battles"),
-    pl.col("result").value_counts().alias("win_loss")
-])
-```
+> **Note for Streamlit Cloud users:** The sample data provided is static and intended for demonstration purposes only. Do not expect fresh or up-to-date data when running the app on Streamlit Cloud.
 
 ---
 
-## 🚀 Next Steps
+## 🧩 Key Technologies
 
-- [ ] Add Jupyter notebooks for data exploration
-- [ ] Build dashboards with Streamlit or Plotly
-- [ ] Implement automated data quality checks
-- [ ] Add more comprehensive battle analysis
-- [ ] Create scheduled data pipeline with cron/Airflow
-- [ ] Add data visualization components
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `make test`
-5. Run linting: `make lint`
-6. Submit a pull request
+- **Python 3.12+**
+- **Polars**: Fast DataFrame analytics; used for all data transformation, cleaning, and Parquet file operations throughout the ETL pipeline.
+- **DuckDB**: Embedded analytics database; used for efficient SQL analytics and dashboard queries (via the analytics/ modules and Streamlit app).
+- **Pydantic**: Data validation; used for strict schema validation and parsing of all ingested JSON data from the Brawl Stars API.
+- **UV**: Modern Python package and environment manager; used for reproducible, fast dependency management and environment setup.
+- **Streamlit**: Interactive dashboard for data exploration and analytics.
+- **Ruff, isort**: Linting & formatting for code quality and consistency.
+- **pytest**: Testing framework for unit and integration tests.
+- **pre-commit**: Code quality automation (linting, formatting, and tests before every commit).
 
 ---
 
-## 📄 License
+## 🚧 TODO / Must-Have Improvements
 
-MIT License - see LICENSE file for details
+### Quick Wins & Easy Improvements
+- Continue to clean and enrich the data (e.g., add support for 'tie' results, not just win/loss)
+- Collect and store additional features (e.g., trophyChange per match, more granular player stats)
+- Add more unit tests (current tests are for demo purposes and not exhaustive)
+- Implement a raw masking strategy for player or club tags that contain irrelevant or sensitive properties
+- Add more visualizations and metrics to the Streamlit dashboard
+- Improve error handling and logging throughout the pipeline
+- Refactor and document code for even greater clarity and maintainability
+
+### Advanced & Industrial-Scale Improvements
+
+- **Data Source & Access**
+  - Ideally, contact Supercell to explore access to a premium API (with fewer constraints) or direct connection to their flat/raw data. This would enable more robust, scalable, and real-time data engineering workflows.
+
+- **Cloud & Scalability**
+  - Enable cloud scalability (deploy on GCP, AWS or Azure)
+  - Use Apache Iceberg for open table format, enabling efficient historical data management and time travel queries
+
+- **Orchestration & Automation**
+  - Orchestrate the pipeline with Airflow to manage dependencies and scheduling between medallion layers
+  - Build a full CI/CD pipeline for automated testing, deployment, and monitoring
+
+- **Real-Time & Streaming**
+  - Integrate Cloud Pub/Sub (or Kafka) for real-time event ingestion
+  - Add Flink or Spark Streaming for real-time/near-real-time data processing
+
+- **Batch & Distributed Processing**
+  - Use Spark for large-scale batch processing and distributed analytics at scale
+
+- **Data Modeling & History**
+  - Implement Change Data Capture (CDC) for incremental updates
+  - Support Slowly Changing Dimensions (SCD):
+    - **Type 2** for full historical tracking (each change creates a new record)
+    - **Type 3** for partial history (track previous and current values)
+
+- **Monitoring & Analytics**
+  - Implement robust monitoring, alerting, and data quality checks
+  - Add advanced analytics (e.g., churn prediction, player segmentation, anomaly detection)
 
 ---
-
-## 📞 Support
-
-For questions or issues:
-- Open an issue on GitHub
-- Check the documentation in the `docs/` folder
-- Review the test examples for usage patterns

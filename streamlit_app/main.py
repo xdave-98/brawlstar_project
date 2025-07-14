@@ -29,6 +29,10 @@ from brawlstar_project.constants.paths import get_data_root  # noqa: E402
 
 st.title("BrawlStars Dashboard")
 
+st.info("This application is a demo. The data shown is static and based on a snapshot (not live or up-to-date)")
+st.caption("App created by Xavier DAVE")
+st.markdown("[View the project on GitHub](https://github.com/xdave-98/brawlstar_project)")
+
 
 # Load dimension tables
 def load_dim_players():
